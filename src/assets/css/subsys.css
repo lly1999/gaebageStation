@@ -1,0 +1,35 @@
+/* 子系统的通用样式 */
+.container{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .logo-title {
+    font-size: 24px;
+    color: #ffffff;
+    line-height: 50px;
+  }
+  .logo-title::after{
+    content: "|";
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  
+  .content{
+    font-size: 18px;
+    color: #ffffff;
+    line-height: 50px;
+  }
+  
+  .data-container{
+    display: flex;
+  }
+  
+  .menu{
+    height: 100%;
+  }
+  
+  .menu-img {
+    display:flex;/* 设置菜单栏图片与文字对齐 */
+    margin-right: 1em;
+  }
