@@ -22,7 +22,7 @@ const routes = [
         children: [{
             name: 'map',
             path: 'map',//子组件的path不以/开头
-            component: () => import('@/views/home/components/MapView.vue')
+            component: Home//() => import('@/views/home/components/MapView.vue')
         },
 
 

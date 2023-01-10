@@ -29,7 +29,7 @@
                     <el-table-column label="承运车辆" width="150">
                         <template #default="scope">
                             <el-button size="medium" type="primary" link @click="handleEdit(scope.$index, scope.row)">{{
-                                    scope.row.carNumber
+                                scope.row.carNumber
                             }}</el-button>
                         </template>
                     </el-table-column>
@@ -60,10 +60,8 @@ import { useRouter, useRoute } from "vue-router";
 import Charts from '@jiaminghi/charts'
 import { House, ArrowDown, Setting, Link } from "@element-plus/icons-vue";
 import Header from "@/components/Header.vue";
-import Map from "@/views/home/components/MapView.vue"
 import { ref, reactive, computed, onBeforeMount, onMounted } from "vue";
 import axios from 'axios';
-import MapContent from "@/components/Mapcontent.vue"
 import { getPage, getQuery } from '@/api/content.js'
 const value = ref('')
 const shortcuts = [
@@ -283,7 +281,7 @@ onBeforeMount(() => {
                     var alert_status = Math.abs(yAxis_alert.value[0] - yAxis.value[6])
 
 
-                    if (alert_status < Number((yAxis_alert.value[0] * 0.15).toFixed(0))) {
+                    if (alert_status < Number((yAxis_alert.value[0] * 0.2).toFixed(0))) {
                         alert_tag.value.type = 'success'
                         alert_tag.value.name = '正常'
                     }

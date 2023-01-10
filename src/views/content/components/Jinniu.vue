@@ -52,8 +52,7 @@
 import { useRouter, useRoute } from "vue-router";
 import Charts from '@jiaminghi/charts'
 import { House, ArrowDown, Setting, Link } from "@element-plus/icons-vue";
-import Header from "@/components/Header.vue";
-import Map from "@/views/home/components/MapView.vue"
+
 import { ref, reactive, computed, onBeforeMount, onMounted } from "vue";
 import axios from 'axios';
 import MapContent from "@/components/Mapcontent.vue"

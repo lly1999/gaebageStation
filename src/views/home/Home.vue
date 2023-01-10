@@ -174,7 +174,6 @@ import { useRouter, useRoute } from "vue-router";
 import Charts from '@jiaminghi/charts'
 import { House, ArrowDown, Setting, Link } from "@element-plus/icons-vue";
 import Header from "@/components/Header.vue";
-import Map from "@/views/home/components/MapView.vue"
 import { ref, reactive, computed, onBeforeMount, onMounted } from "vue";
 import axios from 'axios';
 import MapContent from "@/components/Mapcontent.vue"
@@ -199,6 +198,7 @@ const yingmenkouVisible = ref(false)
 const xingshengVisible = ref(false)
 
 var time = (new Date).getTime();
+// 获取当前时间，转化时间戳为正常格式
 const current_time = new Date().getFullYear() + '-' + (new Date().getMonth() + 1)
   + '-' + new Date().getDate() + "T" + (new Date().getHours().toString()).padStart(2, 0) + ":" + (new Date().getMinutes().toString()).padStart(2, 0) + ":" + ((new Date().getSeconds()).toString()).padStart(2, 0)
 const time_before_one_minutes = new Date(time - 12 * 60 * 60 * 1000).getFullYear() + '-' + (new Date(time - 12 * 60 * 60 * 1000).getMonth() + 1) + '-' + new Date(time - 12 * 60 * 60 * 1000).getDate() + "T" + (new Date().getHours().toString()).padStart(2, 0) + ":"
@@ -224,9 +224,10 @@ onBeforeMount(() => {
   getCars().then(data => {
     carData.value = data
 
-
+    //获取所有车辆的最新位置
     getCarsLocation().then(data => {
       for (var car in data) {
+        //前13为仁和星牛的车辆
         if (car < 13) {
           var currentCar = {
             lastTime: data[car].exactDate,
@@ -244,6 +245,7 @@ onBeforeMount(() => {
 
           carList.value.push(currentCar)
         }
+        //后面为天府环境
         else {
           var currentCar = {
             lastTime: data[car].exactDate,
@@ -268,7 +270,7 @@ onBeforeMount(() => {
   })
 }
 )
-
+// 点击tdt-marker的绑定事件，展示轨迹和车辆信息
 function showCar(car) {
   getCarGps(car.carNumber, today, current_time).then(data => {
     console.log(data)
