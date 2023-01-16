@@ -286,8 +286,16 @@ onBeforeMount(() => {
                         alert_tag.value.name = '正常'
                     }
                     else if (alert_status >= Number((yAxis_alert.value[0] * 0.2).toFixed(0))) {
-                        alert_tag.value.name = '超过预测值的+-20%'
-                        alert_tag.value.type = 'danger'
+                        var alert_status_signed = yAxis_alert.value[0] - yAxis.value[6]
+                        if (alert_status_signed > 0) {
+                            alert_tag.value.name = '超过预测值的20%'
+                            alert_tag.value.type = 'danger'
+                        }
+
+                        else {
+                            alert_tag.value.name = '低于预测值的20%'
+                            alert_tag.value.type = 'danger'
+                        }
                     }
                     // else if (alert_status >= Number((yAxis_alert.value[0] * 0.3).toFixed(0))) {
                     //     alert_tag.value.name = '警告，与预估值相差大于' + yAxis_alert.value[0] * 0.3 + '吨,目前相差' + alert_status + '吨'
