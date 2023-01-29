@@ -5,7 +5,7 @@
 
       <!-- 系统名字 -->
       <template #title>
-        <span class="text-title">金牛区垃圾站数据归集系统</span>
+        <span class="text-title">金牛区生活垃圾全生命周期管家</span>
       </template>
       <!-- 时间 -->
 

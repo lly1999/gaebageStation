@@ -279,12 +279,12 @@ onBeforeMount(() => {
                     else if (alert_status >= Number((yAxis_alert.value[0] * 0.2).toFixed(0))) {
                         var alert_status_signed = yAxis_alert.value[0] - yAxis.value[6]
                         if (alert_status_signed > 0) {
-                            alert_tag.value.name = '超过预测值的20%'
+                            alert_tag.value.name = '低于预测值的20%'
                             alert_tag.value.type = 'danger'
                         }
 
                         else {
-                            alert_tag.value.name = '低于预测值的20%'
+                            alert_tag.value.name = '超过预测值的20%'
                             alert_tag.value.type = 'danger'
                         }
 

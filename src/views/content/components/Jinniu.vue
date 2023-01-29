@@ -497,21 +497,24 @@ onBeforeMount(() => {
                 if (count == 6) {
                     yAxis_alert.value[0] = ((month_total.value / 1000 / 6).toFixed(0)) * 1
                     var alert_status = Math.abs(yAxis_alert.value[0] - yAxis_week.value[6])
-                    // console.log(alert_status, Number((yAxis_alert.value[0] * 0.15).toFixed(0)))
+
                     // console.log(Number((yAxis_alert.value[0] * 0.15).toFixed(0)))
                     if (alert_status < Number((yAxis_alert.value[0] * 0.2).toFixed(0))) {
+
                         alert_tag.value.type = 'success'
                         alert_tag.value.name = '正常'
                     }
-                    else if (alert_status > Number((yAxis_alert.value[0] * 0.2).toFixed(0)) && alert_status < yAxis_alert.value[0] * 0.3) {
-                        var alert_status_signed = yAxis_alert.value[0] - yAxis.value[6]
+                    else if (alert_status > Number((yAxis_alert.value[0] * 0.2).toFixed(0))) {
+                        var alert_status_signed = yAxis_alert.value[0] - yAxis_week.value[6]
+                        console.log(alert_status_signed > 0)
+
                         if (alert_status_signed > 0) {
-                            alert_tag.value.name = '超过预测值的20%'
+                            alert_tag.value.name = '低于预测值的20%'
                             alert_tag.value.type = 'danger'
                         }
 
                         else {
-                            alert_tag.value.name = '低于预测值的20%'
+                            alert_tag.value.name = '超过预测值的20%'
                             alert_tag.value.type = 'danger'
                         }
                     }

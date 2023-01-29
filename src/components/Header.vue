@@ -5,7 +5,7 @@
     <el-row>
       <!--商标-->
       <el-col :span="12">
-        <div>
+        <div style="margin-top:15px">
           <el-page-header class="page-header" @back="goback" :icon="null">
             <!-- <template #icon>
               <slot name="icon"></slot>
