@@ -32,8 +32,8 @@
 
   <div class="content-mid">
 
-    <div class="card text-white bg-primary mb-3 person-box ">
-      <div class="card-body">
+    <!-- <div class="card text-white bg-primary mb-3 person-box ">
+      <div class="card-body"> -->
         <h5 class="card-title" style="font-size:25px;padding:5px ;text-align: center;">
           <li style="font-size:25px;padding:5px">
             金牛区垃圾今日数据：垃圾净重{{ total_jinniu.toFixed(2) }}吨
@@ -45,8 +45,8 @@
             西华垃圾站今日数据：垃圾净重{{ total_xihua.toFixed(2) }}吨
           </li>
         </h5>
-      </div>
-    </div>
+      <!-- </div>
+    </div> -->
   </div>
   <!-- <div class=" content-r">
     <div class="container">
@@ -490,8 +490,8 @@ const config_xihua = reactive({
 
 .content-mid {
 
-  left: 36vw;
-  width: 34%;
+  /* left: 36vw; */
+  width: 100%;
   height: 12vh;
   background-color:black;
   position: absolute;
@@ -504,6 +504,10 @@ const config_xihua = reactive({
   margin:auto;
   
 
+}
+.card-title{
+  width:30%;
+  margin:auto;
 }
 
 .content-r {
