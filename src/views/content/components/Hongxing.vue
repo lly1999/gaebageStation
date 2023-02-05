@@ -639,7 +639,7 @@ const config_alert = reactive({
 // 过去一周各时段垃圾净重平均值统计
 const avgTime_Line = reactive({
   title: {
-    text: "垃圾报警对比",
+    text: "各时段垃圾平均净重",
   },
   xAxis: {
     name: "日期",
