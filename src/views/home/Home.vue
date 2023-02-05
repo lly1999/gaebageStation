@@ -330,8 +330,8 @@
               <el-table
                 :data="
                   renheList.slice(
-                    (current_page - 1) * pageSize,
-                    current_page * pageSize
+                    (currentpage - 1) * pageSize,
+                    currentpage * pageSize
                   )
                 "
                 style="width: 100%"
@@ -434,6 +434,7 @@
                   :page-size="pageSize"
                   @current-change="getTianfuList"
                   @size-change="handleSizeChange"
+                 
                 />
               </div>
             </div>
@@ -545,7 +546,7 @@ let total_records = ref(1000)
 let current_page = ref(1)
 let totalrecords = ref(1000)
 let currentpage = ref(1)
-let pageSize = ref(1)
+let pageSize = ref(10)
 let pages = ref([])
 let patrols = ref([])
 let page_count = 0
@@ -576,6 +577,8 @@ const value = ref('')
 // =======================================================================sunny
 // 列表展示天府环境4小时内在活动的车牌号
 const getTianfuList = (page) => {
+    // 清空数组，因为请求一次接口，后面都会将这些数据加入数组，所以每次请求一次的时候先清空数组
+  tianfuList.splice(0,tianfuList.length);
   // renheVisible.value = false;
   getCarsLocation().then((resp) => {
     let num = 0
@@ -592,18 +595,21 @@ const getTianfuList = (page) => {
           tianfuList.push(currentCar)
           num++
         }
-        pageSize.value = 10
+
+      }
+    }
+            // pageSize.value = 10
         //总条数
         total_records.value = num
         // 当前页
         current_page.value = page
-      }
-    }
   })
 }
 
 // 列表展示仁和星牛4小时内在活动的车牌号
 const getRenheList = (page) => {
+  // 清空数组，因为请求一次接口，后面都会将这些数据加入数组，所以每次请求一次的时候先清空数组
+   renheList.splice(0,renheList.length);
   // tianfuVisible.value=false
   getAllGps().then((resp) => {
     let num = 0
@@ -620,14 +626,17 @@ const getRenheList = (page) => {
           renheList.push(currentCar)
           num++
         }
-        pageSize.value = 10
+
+      }
+    }
         //总条数
         totalrecords.value = num
         // 当前页
-        currentpage.value = page
-      }
-    }
+    currentpage.value = page
+
+
   })
+ 
 }
 
 getTianfuList(1)
