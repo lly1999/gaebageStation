@@ -12,6 +12,18 @@ initAMapApiLoader({
     key: '61ad75101d54a5371d872c69fdce0d3f'
 })
 
+//全局引入echarts
+import * as echarts from 'echarts';
+//挂载echarts方法
+//vue2.0版本
+// Vue.prototype.$echarts = echarts;
+//vue3.0版本
+//app.config.globalProperties.$echarts = echarts;
+
+
+
+
+
 createApp(App)
     .use(router)
     .use(ElementPlus, {
@@ -24,5 +36,7 @@ createApp(App)
         tk: "6ee41245f1a0d9acb64e891964a7738e"
     })
     .mount('#app')
+    //挂载echarts
+    .config.globalProperties.$echarts = echarts;
 
 //引入高德地图
