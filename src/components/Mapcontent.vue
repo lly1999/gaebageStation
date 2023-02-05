@@ -29,6 +29,7 @@
     </div>
   </div> -->
 
+
   <div class="content-mid">
 
     <div class="card text-white bg-primary mb-3 person-box ">
@@ -489,10 +490,10 @@ const config_xihua = reactive({
 
 .content-mid {
 
-  left: 27vw;
-  width: 46vw;
+  left: 36vw;
+  width: 34%;
   height: 12vh;
-  background-color: #000000;
+  background-color:black;
   position: absolute;
   z-index: 20;
   display: flex;
@@ -500,6 +501,8 @@ const config_xihua = reactive({
   user-select: none;
   opacity: 1;
   color: white;
+  margin:auto;
+  
 
 }
 
@@ -527,6 +530,18 @@ const config_xihua = reactive({
 :deep(.DigitalFlop) {
   width: 25vw;
 }
+
+/* ===========================sunny */
+.chart{
+  height:100px;
+  width:50px;
+  background:burlywood;
+}
+
+li{
+  list-style-type: none;
+}
+/* ============================ */
 </style>
 
 
