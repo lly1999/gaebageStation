@@ -20,8 +20,8 @@
             />
           </div>
         </div>
-        <div class="data-view">
-          <div class="card-Left">
+        <div class="data-view" style="width:100%;">
+          <div class="card-Left" style="width:40%;">
             <h5 class="card-title" style="font-size: 25px; padding: 5px">
               垃圾站当前报警
             </h5>
@@ -41,14 +41,14 @@
             />
           </div>
           <!-- ================================================================ sunny ========================================================sunny -->
-          <div class="card-Right">
+         <div class="card-Right" style="width:60%;">
             <h5 class="card-title" style="font-size: 25px; padding: 5px">
               过去一周各时段垃圾净重平均值统计
             </h5>
             <!-- <div id="avgTime_Line"></div> -->
             <dv-charts
               :option="avgTime_Line"
-              style="width: 95%; height: 35vh; margin: auto; padding-top: 5vh"
+              style="width: 95%; height: 35vh; margin: auto; padding-top: 4vh"
             />
           </div>
 
@@ -506,15 +506,19 @@ onBeforeMount(() => {
           if (count == 6) {
             yAxis_alert.value[0] =
               (month_total.value / 1000 / 6).toFixed(0) * 1;
+           console.log(yAxis_alert.value[0])
+              console.log(yAxis.value[6])
             var alert_status = Math.abs(yAxis_alert.value[0] - yAxis.value[6]);
+            console.log(alert_status)
+console.log(Number((yAxis_alert.value[0] * 0.2).toFixed(0)))
 
             if (
-              alert_status < Number((yAxis_alert.value[0] * 0.15).toFixed(0))
+              alert_status <= Number((yAxis_alert.value[0] * 0.2))
             ) {
               alert_tag.value.type = "success";
               alert_tag.value.name = "正常";
             } else if (
-              alert_status >= Number((yAxis_alert.value[0] * 0.2).toFixed(0))
+              alert_status > Number((yAxis_alert.value[0] * 0.2))
             ) {
               var alert_status_signed = yAxis_alert.value[0] - yAxis.value[6];
               if (alert_status_signed > 0) {

@@ -100,7 +100,15 @@ function toSystem(item) {
   router.push({ name: item.to, params: item.systemName })
 }
 //部门列表, 从后端获取
-onMounted(() => router.push('/content/jinniu'))
+onMounted(() => {
+// 默认跳转到jinniu子组件
+  router.push('/content/jinniu');
+  //从地图主页跳转到content下的其他子组件
+  if (route.query.carNumber) {
+    var carNumber=route.query.carNumber
+    router.push({ path: "/content/carDetailInfo", query: {carNumber: carNumber } });
+  }
+})
 
 
 // 系统列表

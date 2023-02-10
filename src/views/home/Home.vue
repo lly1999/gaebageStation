@@ -26,7 +26,7 @@
         </div>
         <el-dropdown>
           <span class="el-dropdown-link">
-            {{ user.username + '（' + user.role + '）' }}
+            {{ user.username + "（" + user.role + "）" }}
             <el-icon>
               <ArrowDown />
             </el-icon>
@@ -89,7 +89,10 @@
               >
                 小站垃圾净重量
               </h5>
-              <div class="card-body" style="padding-top: 5px">
+              <div
+                class="card-body"
+                style="padding-top: 10px; width: 25vw; height: 35vh"
+              >
                 <div id="small_pie"></div>
               </div>
             </dv-border-box7>
@@ -113,7 +116,7 @@
                 仁和星牛车辆
               </h5>
               <div class="card-body" style="padding-top: 5px">
-                <div id="renhe_pie" @click="renheVisible = true"></div>
+                <div id="renhe_pie" ></div>
               </div>
             </dv-border-box7>
 
@@ -134,7 +137,7 @@
                 天府环境车辆
               </h5>
               <div class="card-body" style="padding-top: 5px">
-                <div id="tianfu_pie" @click="tianfuVisible = true"></div>
+                <div id="tianfu_pie"></div>
               </div>
             </dv-border-box7>
           </div>
@@ -315,9 +318,13 @@
             <h2>垃圾站部署中</h2>
           </div>
         </el-dialog>
-        <el-dialog v-model="renheVisible" title="仁和星牛车辆活动情况">
+        <el-dialog
+          v-model="renheVisible"
+          title="仁和星牛车辆活动情况"
+          @close="handleClose"
+        >
           <div class="card">
-            <div class="card-body">
+            <div class="card-body" style="text-align: center">
               <div
                 style="
                   text-align: center;
@@ -325,7 +332,7 @@
                   font-weight: bold;
                 "
               >
-                最近4小时内在活动的车辆列表
+                仁和星牛的车辆活动情况列表
               </div>
               <el-table
                 :data="
@@ -345,7 +352,17 @@
                   header-align="center"
                   align="center"
                   :show-overflow-tooltip="true"
-                />
+                >
+                  <template #default="scope">
+                    <el-button
+                      size="medium"
+                      type="primary"
+                      link
+                      @click="handleEdit(scope.$index, scope.row)"
+                      >{{ scope.row.carNumber }}
+                    </el-button>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="day"
                   label="最新gps记录时间"
@@ -360,26 +377,33 @@
                   header-align="center"
                   align="center"
                   :show-overflow-tooltip="true"
-                />
+                />tianfuVisible
               </el-table>
 
-              <div class="float-end" style="margin-top: 1vh">
+              <div
+                class="float-end"
+                style="margin-top: 1vh; display: inline-block; float: none"
+              >
                 <el-pagination
                   background
                   layout="total, prev, pager, next, jumper"
                   :total="totalrecords"
                   :current-page="currentpage"
                   :page-size="pageSize"
-                  @current-change="getRenheList"
+                  @current-change="getRenhe"
                   @size-change="handleSizeChange"
                 />
               </div>
             </div>
           </div>
         </el-dialog>
-        <el-dialog v-model="tianfuVisible" title="天府环境车辆活动情况">
+        <el-dialog
+          v-model="tianfuVisible"
+          title="天府环境车辆活动情况"
+          @close="handleClose"
+        >
           <div class="card">
-            <div class="card-body">
+            <div class="card-body" style="text-align: center">
               <div
                 style="
                   text-align: center;
@@ -387,7 +411,7 @@
                   font-weight: bold;
                 "
               >
-                最近4小时内在活动的车辆列表
+                天府环境的车辆活动情况列表
               </div>
               <el-table
                 :data="
@@ -407,7 +431,17 @@
                   header-align="center"
                   align="center"
                   :show-overflow-tooltip="true"
-                />
+                >
+                  <template #default="scope">
+                    <el-button
+                      size="medium"
+                      type="primary"
+                      link
+                      @click="handleEdit(scope.$index, scope.row)"
+                      >{{ scope.row.carNumber }}
+                    </el-button>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="day"
                   label="最新gps记录时间"
@@ -425,16 +459,18 @@
                 />
               </el-table>
 
-              <div class="float-end" style="margin-top: 1vh">
+              <div
+                class="float-end"
+                style="margin-top: 1vh; display: inline-block; float: none"
+              >
                 <el-pagination
                   background
                   layout="total, prev, pager, next, jumper"
                   :total="total_records"
                   :current-page="current_page"
                   :page-size="pageSize"
-                  @current-change="getTianfuList"
+                  @current-change="getTianfu"
                   @size-change="handleSizeChange"
-                 
                 />
               </div>
             </div>
@@ -448,7 +484,7 @@
 <script setup>
 // ==========================================================================================================sunny
 // 导入echarts
-import * as echarts from 'echarts'
+import * as echarts from "echarts";
 // 从vue库中引包需要声明
 import {
   ref,
@@ -457,196 +493,270 @@ import {
   onBeforeMount,
   onMounted,
   onBeforeUnmount,
-} from 'vue'
+} from "vue";
 // 调用接口中的方法
-import { getPage, getQuery, getJinNniuToday } from '@/api/content.js'
+import { getPage, getQuery, getJinNniuToday } from "@/api/content.js";
 // 搜索的图标
-import { Location, Search } from '@element-plus/icons-vue'
+import { Location, Search } from "@element-plus/icons-vue";
 
 //==============================================================================================================
-import { useRouter, useRoute } from 'vue-router'
-import Charts from '@jiaminghi/charts'
-import { House, ArrowDown, Setting, Link } from '@element-plus/icons-vue'
-import Header from '@/components/Header.vue'
+import { useRouter, useRoute } from "vue-router";
+import Charts from "@jiaminghi/charts";
+import { House, ArrowDown, Setting, Link } from "@element-plus/icons-vue";
+import Header from "@/components/Header.vue";
 
-import axios from 'axios'
-import MapContent from '@/components/Mapcontent.vue'
-import Hongxing from '@/views/content/components/Hongxing.vue'
-import Xihua from '@/views/content/components/Xihua.vue'
-import Honghuayan from '@/views/content/components/Honghuayan.vue'
-import Wukuaishi from '@/views/content/components/Wukuaishi.vue'
-import Wulidun from '@/views/content/components/Wulidun.vue'
-import { getCars } from '@/api/content'
-import { getCarGps, getAllGps } from '@/api/content'
-import { getCarsLocation } from '@/api/home'
-const xihuaVisible = ref(false)
-const hongxingVisible = ref(false)
-const honghuayanVisible = ref(false)
-const wulidunVisible = ref(false)
-const wukuaishiVisible = ref(false)
-const xibeiqiaoVisible = ref(false)
-const jinquanVisible = ref(false)
-const quanshuiVisible = ref(false)
-const huangzhongVisible = ref(false)
-const yingmenkouVisible = ref(false)
-const xingshengVisible = ref(false)
+import axios from "axios";
+import MapContent from "@/components/Mapcontent.vue";
+import Hongxing from "@/views/content/components/Hongxing.vue";
+import Xihua from "@/views/content/components/Xihua.vue";
+import Honghuayan from "@/views/content/components/Honghuayan.vue";
+import Wukuaishi from "@/views/content/components/Wukuaishi.vue";
+import Wulidun from "@/views/content/components/Wulidun.vue";
+import CarRecord from '@/views/content/components/CarRecord.vue'
+import { getCars } from "@/api/content";
+import { getCarGps, getAllGps } from "@/api/content";
+import { getCarsLocation } from "@/api/home";
+const xihuaVisible = ref(false);
+const hongxingVisible = ref(false);
+const honghuayanVisible = ref(false);
+const wulidunVisible = ref(false);
+const wukuaishiVisible = ref(false);
+const xibeiqiaoVisible = ref(false);
+const jinquanVisible = ref(false);
+const quanshuiVisible = ref(false);
+const huangzhongVisible = ref(false);
+const yingmenkouVisible = ref(false);
+const xingshengVisible = ref(false);
+const innerVisible = ref(false);
 // ========================================================sunny
-let tianfuhuanjing = new Map()
-const renheVisible = ref(false)
-const tianfuVisible = ref(false)
-const tianfuList = reactive([])
-const renheList = reactive([])
+let tianfuhuanjing = new Map();
+const renheVisible = ref(false);
+const tianfuVisible = ref(false);
+const tianfuList = reactive([]);
+const renheList = reactive([]);
 // const current_page = ref(1);
 // const total_records = ref(0);
-const queryName = ref('')
+const queryName = ref("");
 // const queryAgency = ref('');
-const banshichuSelected = ref('全部')
+const banshichuSelected = ref("全部");
 
 const banshichuNoneSelectedStyle = ref(
-  'text-align: center; padding-top: 10px; padding-bottom:10px; '
-)
+  "text-align: center; padding-top: 10px; padding-bottom:10px; "
+);
 const banshichuSelectedStyle = ref(
-  'text-align: center; padding-top: 10px; padding-bottom:10px; background-color: #0D6EFD; color: white;'
-)
+  "text-align: center; padding-top: 10px; padding-bottom:10px; background-color: #0D6EFD; color: white;"
+);
+// 车辆的状态
+const tianfu_carStatus = ref("在活动");
+const renhe_carStatus = ref("在活动");
+
 // ============================================================
 
-var time = new Date().getTime()
+var time = new Date().getTime();
 // 获取当前时间，转化时间戳为正常格式
 const current_time =
   new Date().getFullYear() +
-  '-' +
+  "-" +
   (new Date().getMonth() + 1) +
-  '-' +
+  "-" +
   new Date().getDate() +
-  'T' +
+  "T" +
   new Date().getHours().toString().padStart(2, 0) +
-  ':' +
+  ":" +
   new Date().getMinutes().toString().padStart(2, 0) +
-  ':' +
-  new Date().getSeconds().toString().padStart(2, 0)
+  ":" +
+  new Date().getSeconds().toString().padStart(2, 0);
 const time_before_one_minutes =
   new Date(time - 12 * 60 * 60 * 1000).getFullYear() +
-  '-' +
+  "-" +
   (new Date(time - 12 * 60 * 60 * 1000).getMonth() + 1) +
-  '-' +
+  "-" +
   new Date(time - 12 * 60 * 60 * 1000).getDate() +
-  'T' +
+  "T" +
   new Date().getHours().toString().padStart(2, 0) +
-  ':' +
+  ":" +
   new Date().getMinutes().toString().padStart(2, 0) +
-  ':' +
-  new Date().getSeconds().toString().padStart(2, 0)
+  ":" +
+  new Date().getSeconds().toString().padStart(2, 0);
 
-console.log(time_before_one_minutes)
+console.log(time_before_one_minutes);
 function logout() {
   //TODO 清除登录信息
-  router.push('/login')
+  router.push("/login");
 }
-let total_records = ref(1000)
-let current_page = ref(1)
-let totalrecords = ref(1000)
-let currentpage = ref(1)
-let pageSize = ref(10)
-let pages = ref([])
-let patrols = ref([])
-let page_count = 0
-var renhe_car = new Map()
-var tianfu_car = new Map()
-const carData = ref([])
-const carinfo = ref([])
-const carList = ref([])
-const carnumList = ref([])
-const car = ref({})
+let total_records = ref(1000);
+let current_page = ref(1);
+let totalrecords = ref(1000);
+let currentpage = ref(1);
+let pageSize = ref(10);
+let pages = ref([]);
+let patrols = ref([]);
+let page_count = 0;
+var renhe_car = new Map();
+var tianfu_car = new Map();
+const carData = ref([]);
+const carinfo = ref([]);
+const carList = ref([]);
+const carnumList = ref([]);
+const car = ref({});
 const today =
   new Date().getFullYear() +
-  '-' +
+  "-" +
   (new Date().getMonth() + 1) +
-  '-' +
-  new Date().getDate()
+  "-" +
+  new Date().getDate();
 const now_time =
   new Date().getHours() +
-  ':' +
+  ":" +
   new Date().getMinutes() +
-  ':' +
-  new Date().getSeconds()
-console.log(current_time)
+  ":" +
+  new Date().getSeconds();
+console.log(current_time);
 
 // ====================================================================================sunny
-const value = ref('')
-
+const value = ref("");
+function handleClose() {
+  currentpage.value = 1;
+  current_page.value = 1;
+}
 // =======================================================================sunny
-// 列表展示天府环境4小时内在活动的车牌号
+// 列表展示天府环境4小时内在活动的车牌号re
 const getTianfuList = (page) => {
-    // 清空数组，因为请求一次接口，后面都会将这些数据加入数组，所以每次请求一次的时候先清空数组
-  tianfuList.splice(0,tianfuList.length);
+  // 清空数组，因为请求一次接口，后面都会将这些数据加入数组，所以每次请求一次的时候先清空数组
+  tianfuList.splice(0, tianfuList.length);
+      tianfu_car.forEach((val, key) => {
+      if (val != 0) {
+        val = 0;
+      }
+    })
   // renheVisible.value = false;
   getCarsLocation().then((resp) => {
-    let num = 0
+    let num = 0;
+    var zonggong = 0;
     for (var car in resp) {
-      let gps_time = Date.parse(resp[car].exactDate.replace('T', ' '))
-      resp[car].carNumber = trim(resp[car].carNumber)
+      let gps_time = Date.parse(resp[car].exactDate.replace("T", " "));
+      resp[car].carNumber = trim(resp[car].carNumber);
+      
       if (tianfu_car.has(resp[car].carNumber.toUpperCase())) {
+        zonggong++;
+        
+        
         if (gps_time + 4 * 60 * 60 * 1000 > time) {
+          tianfu_car.set(resp[car].carNumber.toUpperCase(), 2)
+          console.log("我在这里："+zonggong+":"+resp[car].carNumber.toUpperCase())
           var currentCar = {
             day: resp[car].exactDate,
             carNumber: resp[car].carNumber,
             location: [resp[car].longitude * 1, resp[car].latitude * 1],
-          }
-          tianfuList.push(currentCar)
-          num++
+          };
+          tianfuList.push(currentCar);
+          num++;
         }
-
       }
+
     }
-            // pageSize.value = 10
-        //总条数
-        total_records.value = num
-        // 当前页
-        current_page.value = page
-  })
-}
+    var gong = 0;
+    tianfu_car.forEach((val, key) => {
+      gong++;
+      if (val != 2) {
+                  var currentCar = {
+            day: "停用",
+            carNumber: key,
+            location: "停用",
+        };
+                    tianfuList.push(currentCar);
+          num++;
+      }
+      console.log(gong+":"+key,val)
+    })
+    var zong = 0;
+    tianfu_car.forEach((val, key) => {
+      zong++;
+      if (val != 0) {
+        val = 0;
+      }
+      console.log(zong+":"+key,val)
+    })
+    console.log("天府环境多少辆："+tianfu_car.size)
+    // pageSize.value = 10
+    //总条数
+    total_records.value = num;
+    // 当前页
+    current_page.value = page;
+  });
+};
+
+// 列表展示天府环境4小时内在活动的车牌号
+const getTianfu = (page) => {
+  // 当前页
+  current_page.value = page;
+};
 
 // 列表展示仁和星牛4小时内在活动的车牌号
 const getRenheList = (page) => {
   // 清空数组，因为请求一次接口，后面都会将这些数据加入数组，所以每次请求一次的时候先清空数组
-   renheList.splice(0,renheList.length);
+  renheList.splice(0, renheList.length);
   // tianfuVisible.value=false
   getAllGps().then((resp) => {
-    let num = 0
+    let num = 0;
     for (var car in resp) {
-      let gps_time = Date.parse(resp[car].exactDate.replace('T', ' '))
-      resp[car].carNumber = trim(resp[car].carNumber)
+      let gps_time = Date.parse(resp[car].exactDate.replace("T", " "));
+      resp[car].carNumber = trim(resp[car].carNumber);
       if (renhe_car.has(resp[car].carNumber.toUpperCase())) {
+        
         if (gps_time + 4 * 60 * 60 * 1000 > time) {
+          renhe_car.set(resp[car].carNumber.toUpperCase(),2)
           var currentCar = {
             day: resp[car].exactDate,
             carNumber: resp[car].carNumber,
             location: [resp[car].longitude * 1, resp[car].latitude * 1],
-          }
-          renheList.push(currentCar)
-          num++
+          };
+          renheList.push(currentCar);
+          num++;
         }
-
       }
     }
-        //总条数
-        totalrecords.value = num
-        // 当前页
-    currentpage.value = page
+        renhe_car.forEach((val, key)=>{
+      if (val != 2) {
+                  var currentCar = {
+            day: "停用",
+            carNumber: key,
+            location: "停用",
+        };
+          renheList.push(currentCar);
+          num++;
+      }
+    })
+    renhe_car.forEach((val, key) => {
+      if (val != 0) {
+        val = 0;
+      }
+    })
+    //总条数
+    totalrecords.value = num;
+    // 当前页
+    currentpage.value = page;
+  });
+};
 
+// 列表展示仁和星牛4小时内在活动的车牌号
+const getRenhe = (page) => {
+  // 当前页
+  currentpage.value = page;
+};
 
-  })
- 
-}
-
-getTianfuList(1)
-getRenheList(1)
+// 点击车牌号展示该车辆相关信息
+const handleEdit = (index, row) => {
+  var carNumber = row.carNumber;
+  router.push({ name: "cardetailinfo", query: { carNumber: carNumber } });
+  console.log(index, carNumber);
+};
 
 onMounted(() => {
   if (window.screen.width > 2000 && window.devicePixelRatio == 1) {
-    document.getElementsByClassName('container')[1].style.marginLeft = '750px'
+    document.getElementsByClassName("container")[1].style.marginLeft = "750px";
   }
-})
+});
 
 // =====================================================================================
 
@@ -658,28 +768,28 @@ onBeforeMount(() => {
   getCars().then(function (resp) {
     for (let i = 0; i < resp.length; i++) {
       //统计天府环境和仁和星牛的车
-      if (resp[i].company == '仁和星牛') {
+      if (resp[i].company == "仁和星牛") {
         //去掉车牌号中多余的空格
-        resp[i].carNumber = trim(resp[i].carNumber)
+        resp[i].carNumber = trim(resp[i].carNumber);
         //将车牌号中的字母都设置为大写，防止登记车牌时写错
         if (!renhe_car.has(resp[i].carNumber.toUpperCase())) {
-          renhe_car.set(resp[i].carNumber.toUpperCase(), 0)
+          renhe_car.set(resp[i].carNumber.toUpperCase(), 0);
         }
       }
-      if (resp[i].company == '天府环境') {
+      if (resp[i].company == "天府环境") {
         //去掉车牌号中多余的空格
-        resp[i].carNumber = trim(resp[i].carNumber)
+        resp[i].carNumber = trim(resp[i].carNumber);
         //将车牌号中的字母都设置为大写，防止登记车牌时写错
         if (!tianfu_car.has(resp[i].carNumber.toUpperCase())) {
-          tianfu_car.set(resp[i].carNumber.toUpperCase(), 0)
+          tianfu_car.set(resp[i].carNumber.toUpperCase(), 0);
         }
       }
     }
-  })
+  });
 
   // ===================================================================
   getCars().then((data) => {
-    carData.value = data
+    carData.value = data;
 
     //获取所有车辆的最新位置
     getCarsLocation().then((data) => {
@@ -691,16 +801,16 @@ onBeforeMount(() => {
             carVisible: false,
             carNumber: data[car].carNumber,
             location: [data[car].longitude * 1, data[car].latitude * 1],
-            company: '仁和星牛',
+            company: "仁和星牛",
             icon: {
-              iconUrl: require('@/assets/truck.png'),
+              iconUrl: require("@/assets/truck.png"),
               iconSize: [35, 35],
               iconAnchor: [9, 26],
             },
             path: [],
-          }
+          };
 
-          carList.value.push(currentCar)
+          carList.value.push(currentCar);
         }
         //后面为天府环境
         else {
@@ -709,99 +819,100 @@ onBeforeMount(() => {
             carVisible: false,
             carNumber: data[car].carNumber,
             location: [data[car].longitude * 1, data[car].latitude * 1],
-            company: '天府环境',
+            company: "天府环境",
             icon: {
-              iconUrl: require('@/assets/truck_tianfu.png'),
+              iconUrl: require("@/assets/truck_tianfu.png"),
               iconSize: [35, 35],
               iconAnchor: [9, 26],
             },
             path: [],
-          }
+          };
 
-          carList.value.push(currentCar)
+          carList.value.push(currentCar);
         }
       }
-    })
-  })
-})
+    });
+  });
+});
 // 点击tdt-marker的绑定事件，展示轨迹和车辆信息
 function showCar(car) {
   getCarGps(car.carNumber, today, current_time).then((data) => {
-    console.log(data)
+    console.log(data);
     for (let i = 0; i < data.length; i++) {
-      let position = [data[i].longitude * 1, data[i].latitude * 1]
-      car.path.push(position)
+      let position = [data[i].longitude * 1, data[i].latitude * 1];
+      car.path.push(position);
     }
-    console.log(car.path)
-    car.carVisible = true
-  })
+    console.log(car.path);
+    car.carVisible = true;
+    // tianfuVisible = true;
+  });
 }
 
 const station_xibeiqiao = reactive({
   position: [104.067589, 30.691194],
   visible: true,
   icon: {
-    iconUrl: require('@/assets/icon_marker_grey.jpg'),
+    iconUrl: require("@/assets/icon_marker_grey.jpg"),
     iconSize: [25, 35],
     iconAnchor: [9, 26],
   },
-})
+});
 const station_jinquan = reactive({
   position: [104.006995, 30.709358],
   visible: true,
   icon: {
-    iconUrl: require('@/assets/icon_marker_grey.png'),
+    iconUrl: require("@/assets/icon_marker_grey.png"),
     iconSize: [35, 35],
     iconAnchor: [9, 26],
   },
-})
+});
 
 const station_quanshui = reactive({
   position: [104.068824, 30.736328],
   visible: true,
-})
+});
 const station_xingsheng = reactive({
   position: [104.02199, 30.736284],
   visible: true,
-})
+});
 const station_huangzhong = reactive({
   position: [104.018394, 30.695559],
   visible: true,
-})
+});
 const station_yingmenkou = reactive({
   position: [104.044002, 30.707915],
   visible: true,
-})
+});
 const station_xihua = reactive({
   position: [104.009131, 30.754915],
   visible: true,
   icon: {
-    iconUrl: require('@/assets/icon_marker.jpg'),
+    iconUrl: require("@/assets/icon_marker.jpg"),
     iconSize: [35, 45],
     iconAnchor: [9, 26],
   },
-})
+});
 const station_hongxing = reactive({
   position: [104.093035, 30.75222],
   visible: true,
   icon: {
-    iconUrl: require('@/assets/icon_marker.jpg'),
+    iconUrl: require("@/assets/icon_marker.jpg"),
     iconSize: [35, 45],
     iconAnchor: [9, 26],
   },
-})
+});
 const station_honghuayan = reactive({
   position: [104.085243, 30.690125],
   visible: true,
-})
+});
 const station_wukuaishi = reactive({
   position: [104.072792, 30.709706],
   visible: true,
-})
+});
 const station_wulidun = reactive({
   position: [104.04311, 30.694781],
   visible: true,
-})
+});
 //地图在页面中的视野大小以及位置
 const state = reactive({
   //中心点的经纬度，第一个是经度，第二个是维度
@@ -813,20 +924,20 @@ const state = reactive({
   controls: [
     //显示放大缩小的控件
     {
-      name: 'Zoom',
-      position: 'bottomright',
+      name: "Zoom",
+      position: "bottomright",
     },
   ],
   visible: true,
   copyright: true,
-})
+});
 //金牛区的边界线绘制
 const polygon = reactive({
-  fillColor: '#00FFFF',
-  color: '#DC143C',
+  fillColor: "#00FFFF",
+  color: "#DC143C",
   position: [104.03214916, 30.70473032],
   visible: true,
-  lineStyle: 'dashed',
+  lineStyle: "dashed",
   path: [
     [104.05802, 30.678438],
     [104.057178, 30.677989],
@@ -2492,57 +2603,57 @@ const polygon = reactive({
     [104.058454, 30.678348],
     [104.05802, 30.678438],
   ],
-})
+});
 
 onMounted(() => {
-  router.push('/home/map')
-})
-let date = new Date().toLocaleDateString()
-var a = new Array('日', '一', '二', '三', '四', '五', '六')
-var str = new Date().getDay()
-var week = '星期' + a[str]
+  router.push("/home/map");
+});
+let date = new Date().toLocaleDateString();
+var a = new Array("日", "一", "二", "三", "四", "五", "六");
+var str = new Date().getDay();
+var week = "星期" + a[str];
 // 由于<script setup>使用动态组件时，:is属性的值是对象实例，而不是组件名
 // 而menuList里的icon是组件名，因此这里做一个映射
 const icons = {
   House,
   Setting,
-}
+};
 const user = reactive({
-  username: '张三',
-  role: '管理员',
-})
+  username: "张三",
+  role: "管理员",
+});
 // 设置子系统名字
-const route = useRoute()
-const subsysName = ref(route.params.subsysName)
+const route = useRoute();
+const subsysName = ref(route.params.subsysName);
 
 // 导航栏的返回上一级按键
-const router = useRouter()
+const router = useRouter();
 function goback() {
-  router.push('/home')
+  router.push("/home");
 }
 function toHome() {
-  router.push('/content')
+  router.push("/content");
 }
 // 这个应该从后台请求获得
 const menuList = [
-  { icon: '03,16', title: '地图界面', to: 'map', click: '', submenu: [] },
-  { icon: '01,07', title: '人员管理', to: 'rygl', click: '', submenu: [] },
-  { icon: '02.14', title: '围栏管理', to: 'wlgl', click: '', submenu: [] },
-  { icon: '04,14', title: '签到考勤', to: '', click: '', submenu: [] },
+  { icon: "03,16", title: "地图界面", to: "map", click: "", submenu: [] },
+  { icon: "01,07", title: "人员管理", to: "rygl", click: "", submenu: [] },
+  { icon: "02.14", title: "围栏管理", to: "wlgl", click: "", submenu: [] },
+  { icon: "04,14", title: "签到考勤", to: "", click: "", submenu: [] },
   // {icon: 'icon-jkjm.png', title:'案件管理', to:'', click:'', submenu:[{icon:'icon-jkjm.png', title:'子模块1', to:'/subpath1', click:''},  {icon: 'icon-jkjm.png', title:'子模块2', to:'/subpath2', click:''}]},
-]
+];
 function getIcon(idxStr) {
-  const len = -30
-  const x = parseInt(idxStr.split(',')[1] - 1) * len
-  const y = parseInt(idxStr.split(',')[0] - 1) * len
+  const len = -30;
+  const x = parseInt(idxStr.split(",")[1] - 1) * len;
+  const y = parseInt(idxStr.split(",")[0] - 1) * len;
   return {
-    backgroundPositionX: x + 'px',
-    backgroundPositionY: y + 'px',
-  }
+    backgroundPositionX: x + "px",
+    backgroundPositionY: y + "px",
+  };
 }
 
 function displayContent(name) {
-  router.push({ name })
+  router.push({ name });
 }
 
 // ======================================================================================================sunny
@@ -2556,15 +2667,15 @@ const fontSizeSwitch = (res) => {
   let clientWidth =
     window.innerWidth ||
     document.documentElement.clientWidth ||
-    document.body.clientWidth
-  if (!clientWidth) return
-  let fontSize = 100 * (clientWidth / 1707)
-  return res * fontSize
-}
+    document.body.clientWidth;
+  if (!clientWidth) return;
+  let fontSize = 100 * (clientWidth / 1707);
+  return res * fontSize;
+};
 //定义total
-const total = ref(2)
+const total = ref(2);
 //全局定义图表
-let category_chart = null
+let category_chart = null;
 
 //图表的基础模板
 let categoryOption = {
@@ -2573,7 +2684,7 @@ let categoryOption = {
   //   text: 'ECharts 入门示例',
   // },
   tooltip: {
-    trigger: 'item',
+    trigger: "item",
   },
   labelLine: {
     // 统一设置指示线长度
@@ -2581,115 +2692,118 @@ let categoryOption = {
     normal: {
       length: 40, //设置指示线的长度
       lineStyle: {
-        color: 'red', // 设置标示线的颜色
+        color: "red", // 设置标示线的颜色
       },
     },
   },
 
   series: [
     {
-      name: '垃圾净重量平均值',
+      name: "当天垃圾净重总量",
       //设置图表类型是折线图
-      type: 'pie',
-      radius: '50%',
+      type: "pie",
+      radius: "50%",
       data: [
-        { value: 0, name: '红星' },
-        { value: 0, name: '西华' },
+        { value: 0, name: "红星" },
+        { value: 0, name: "西华" },
       ],
 
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
           shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)',
+          shadowColor: "rgba(0, 0, 0, 0.5)",
         },
       },
       label: {
-        overflow: 'none',
+        overflow: "none",
         show: true,
         //指示线消失
         // position: 'top',
 
         fontSize: fontSizeSwitch(0.15),
         //展示每个点的对应数值，这里必须是{c}才能显示数据
-        formatter: '{b}:{c} 吨',
+        formatter: "{b}:{c} 吨",
         //修改标签上的字体颜色
-        color: '#fff',
+        color: "#fff",
       },
     },
   ],
-}
+};
 
 /**
  * 获取后端数据，并动态展示在图表上
  */
 const create_category_data = () => {
-  let chartDom = document.getElementById('large_pie')
+  let chartDom = document.getElementById("large_pie");
   //初始化图表
-  category_chart = echarts.init(chartDom)
+  category_chart = echarts.init(chartDom);
+  category_chart.on('click', (params) => {
+    console.log("params:"+ params.data.name);
+  })
 
   //绘制图表
-  category_chart.setOption(categoryOption)
-  window.addEventListener('resize', category_chart.resize)
+  category_chart.setOption(categoryOption);
+  window.addEventListener("resize", category_chart.resize);
 
   /**
    * 通过接口获取后端数据
    * 查找开始时间是七天前凌晨开始，到今天凌晨，一共七天，比如今天是2023.02.01，则从2023.01.25凌晨开始，2023.02.01凌晨结束，不算今天的
    */
   getQuery(
-    '红星',
-    'transporter',
+    "红星",
+    "transporter",
 
     new Date(time).getFullYear() +
-      '-' +
+      "-" +
       (new Date(time).getMonth() + 1) +
-      '-' +
+      "-" +
       new Date(time).getDate(),
     new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() +
-      '-' +
+      "-" +
       (new Date(time + 1 * 24 * 60 * 60 * 1000).getMonth() + 1) +
-      '-' +
+      "-" +
       new Date(time + 1 * 24 * 60 * 60 * 1000).getDate(),
     1,
     10000
   ).then(function (resp) {
-    total.value = 0
+    total.value = 0;
     for (let i = 0; i < resp.length; i++) {
-      total.value = resp[i].netWeight + total.value
+      total.value = resp[i].netWeight + total.value;
     }
-    total.value = Math.floor((total.value / 1000) * 100) / 100
+    total.value = Math.floor((total.value / 1000) * 100) / 100;
     //更改图表上对应位置的数据
-    categoryOption.series[0].data[0].value = Number(total.value.toFixed(0))
+    categoryOption.series[0].data[0].value = Number(total.value.toFixed(0));
     //更新页面上的图表
-    category_chart.setOption(categoryOption)
-  })
+    category_chart.setOption(categoryOption);
+  });
   getQuery(
-    '西华',
-    'transporter',
+    "西华",
+    "transporter",
     new Date(time).getFullYear() +
-      '-' +
+      "-" +
       (new Date(time).getMonth() + 1) +
-      '-' +
+      "-" +
       new Date(time).getDate(),
     new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() +
-      '-' +
+      "-" +
       (new Date(time + 1 * 24 * 60 * 60 * 1000).getMonth() + 1) +
-      '-' +
+      "-" +
       new Date(time + 1 * 24 * 60 * 60 * 1000).getDate(),
     1,
     10000
   ).then(function (resp) {
-    total.value = 0
+    total.value = 0;
     for (let i = 0; i < resp.length; i++) {
-      total.value = resp[i].netWeight + total.value
+      total.value = resp[i].netWeight + total.value;
     }
-    total.value = Math.floor((total.value / 1000) * 100) / 100
+    total.value = Math.floor((total.value / 1000) * 100) / 100;
     //更改图表上对应位置的数据
-    categoryOption.series[0].data[1].value = Number(total.value.toFixed(0))
+    categoryOption.series[0].data[1].value = Number(total.value.toFixed(0));
     //更新页面上的图表
-    category_chart.setOption(categoryOption)
-  })
-}
+    category_chart.setOption(categoryOption);
+  });
+};
 
 // const ageGenderRequest = () => {
 
@@ -2704,28 +2818,29 @@ const create_category_data = () => {
 //调整字体大小
 
 //定义total
-const total0 = ref(2)
+const total0 = ref(2);
 //全局定义图表
-let small_chart = null
+let small_chart = null;
 
 //图表的基础模板
 let smallOption = {
   tooltip: {
-    trigger: 'axis',
+    trigger: "axis",
     axisPointer: {
-      type: 'shadow',
+      type: "shadow",
     },
   },
   grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '14%',
+    left: "3%",
+    right: "4%",
+    bottom: "0%",
+    top: "25%",
     containLabel: true,
   },
   xAxis: [
     {
-      type: 'category',
-      data: ['红花堰', '五块石', '五里墩', '其他小站'],
+      type: "category",
+      data: ["红花堰", "五块石", "五里墩", "其他小站"],
       axisTick: {
         alignWithLabel: true,
       },
@@ -2733,7 +2848,7 @@ let smallOption = {
         fontSize: fontSizeSwitch(0.18),
         show: true,
         textStyle: {
-          color: '#fff',
+          color: "#fff",
           margin: 15,
         },
       },
@@ -2741,7 +2856,7 @@ let smallOption = {
   ],
   yAxis: [
     {
-      type: 'value',
+      type: "value",
       axisLabel: {
         fontSize: fontSizeSwitch(0.15),
       },
@@ -2749,196 +2864,202 @@ let smallOption = {
         //y轴线的颜色以及宽度
         show: false,
         lineStyle: {
-          color: '#fff',
+          color: "#fff",
           width: 1,
-          type: 'solid',
+          type: "solid",
         },
       },
     },
   ],
   series: [
     {
-      name: '垃圾净重量平均值',
+      name: "当天垃圾净重总量",
       //设置图表类型是折线图
-      type: 'bar',
+      type: "bar",
+      //  barMaxHeight:200,
       data: [
-        { value: 0, name: '红花堰' },
-        { value: 0, name: '五块石' },
-        { value: 0, name: '五里墩' },
-        { value: 0, name: '其他小站' },
+        { value: 0, name: "红花堰" },
+        { value: 0, name: "五块石" },
+        { value: 0, name: "五里墩" },
+        { value: 0, name: "其他小站" },
       ],
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
           shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)',
+          shadowColor: "rgba(0, 0, 0, 0.5)",
         },
       },
       label: {
-        overflow: 'none',
+        overflow: "none",
         show: true,
         // position: 'top',
         fontSize: fontSizeSwitch(0.15),
         //展示每个点的对应数值，这里必须是{c}才能显示数据
-        formatter: '{b}:{c} 吨',
+        formatter: "{b}:{c} 吨",
         //修改标签上的字体颜色
-        color: '#fff',
+        color: "#fff",
       },
     },
   ],
-}
+};
 
 /**
  * 获取后端数据，并动态展示在图表上
  */
 const create_small_data = () => {
-  let chartDom = document.getElementById('small_pie')
+  let chartDom = document.getElementById("small_pie");
   //初始化图表
-  small_chart = echarts.init(chartDom)
+  small_chart = echarts.init(chartDom);
 
   //绘制图表
-  small_chart.setOption(smallOption)
-  window.addEventListener('resize', small_chart.resize)
+  small_chart.setOption(smallOption);
+  window.addEventListener("resize", small_chart.resize);
+  let honghuayan = 0;
+  let wukuaishi = 0;
+  let wulidun = 0;
+  let xihua = 0;
+  let hongxing = 0;
 
   getQuery(
-    '红花堰',
-    'transporter',
+    "红花堰",
+    "transporter",
     new Date(time).getFullYear() +
-      '-' +
+      "-" +
       (new Date(time).getMonth() + 1) +
-      '-' +
+      "-" +
       new Date(time).getDate(),
     new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() +
-      '-' +
+      "-" +
       (new Date(time + 1 * 24 * 60 * 60 * 1000).getMonth() + 1) +
-      '-' +
-      new Date(time + 1 * 24 * 60 * 60 * 1000).getDate(),
-
-    1,
-    10000
-  ).then(function (resp) {
-    total0.value = 0
-    for (let i = 0; i < resp.length; i++) {
-      total0.value = resp[i].netWeight + total0.value
-    }
-    total0.value = Math.floor((total0.value / 1000) * 100) / 100
-    //更改图表上对应位置的数据
-    smallOption.series[0].data[0].value = Number(total0.value.toFixed(0))
-    //更新页面上的图表
-    small_chart.setOption(smallOption)
-  })
-  getQuery(
-    '五块石',
-    'transporter',
-    new Date(time).getFullYear() +
-      '-' +
-      (new Date(time).getMonth() + 1) +
-      '-' +
-      new Date(time).getDate(),
-    new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() +
-      '-' +
-      (new Date(time + 1 * 24 * 60 * 60 * 1000).getMonth() + 1) +
-      '-' +
+      "-" +
       new Date(time + 1 * 24 * 60 * 60 * 1000).getDate(),
 
     1,
     10000
   ).then(function (resp) {
-    total0.value = 0
+    total0.value = 0;
     for (let i = 0; i < resp.length; i++) {
-      total0.value = resp[i].netWeight + total0.value
+      total0.value = resp[i].netWeight + total0.value;
     }
-    total0.value = Math.floor((total0.value / 1000) * 100) / 100
+    total0.value = Math.floor((total0.value / 1000) * 100) / 100;
     //更改图表上对应位置的数据
-    smallOption.series[0].data[1].value = Number(total0.value.toFixed(0))
+    smallOption.series[0].data[0].value = Number(total0.value.toFixed(0));
+    honghuayan = Number(total0.value.toFixed(0));
+    // console.log(smallOption.series[0].data[0].value+"第一个")
     //更新页面上的图表
-    small_chart.setOption(smallOption)
-  })
+    // small_chart.setOption(smallOption);
+  });
   getQuery(
-    '五里墩',
-    'transporter',
+    "五块石",
+    "transporter",
     new Date(time).getFullYear() +
-      '-' +
+      "-" +
       (new Date(time).getMonth() + 1) +
-      '-' +
+      "-" +
       new Date(time).getDate(),
     new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() +
-      '-' +
+      "-" +
       (new Date(time + 1 * 24 * 60 * 60 * 1000).getMonth() + 1) +
-      '-' +
+      "-" +
+      new Date(time + 1 * 24 * 60 * 60 * 1000).getDate(),
+
+    1,
+    10000
+  ).then(function (resp) {
+    total0.value = 0;
+    for (let i = 0; i < resp.length; i++) {
+      total0.value = resp[i].netWeight + total0.value;
+    }
+    total0.value = Math.floor((total0.value / 1000) * 100) / 100;
+    //更改图表上对应位置的数据
+    smallOption.series[0].data[1].value = Number(total0.value.toFixed(0));
+    wukuaishi = Number(total0.value.toFixed(0));
+    //更新页面上的图表
+    // small_chart.setOption(smallOption);
+  });
+  getQuery(
+    "五里墩",
+    "transporter",
+    new Date(time).getFullYear() +
+      "-" +
+      (new Date(time).getMonth() + 1) +
+      "-" +
+      new Date(time).getDate(),
+    new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() +
+      "-" +
+      (new Date(time + 1 * 24 * 60 * 60 * 1000).getMonth() + 1) +
+      "-" +
       new Date(time + 1 * 24 * 60 * 60 * 1000).getDate(),
     1,
     10000
   ).then(function (resp) {
-    total0.value = 0
+    total0.value = 0;
     for (let i = 0; i < resp.length; i++) {
-      total0.value = resp[i].netWeight + total0.value
+      total0.value = resp[i].netWeight + total0.value;
     }
-    total0.value = Math.floor((total0.value / 1000) * 100) / 100
+    total0.value = Math.floor((total0.value / 1000) * 100) / 100;
     //更改图表上对应位置的数据
-    smallOption.series[0].data[2].value = Number(total0.value.toFixed(0))
+    smallOption.series[0].data[2].value = Number(total0.value.toFixed(0));
+    wulidun = Number(total0.value.toFixed(0));
     //更新页面上的图表
-    small_chart.setOption(smallOption)
-  })
+    // small_chart.setOption(smallOption);
+  });
   getQuery(
-    '红星',
-    'transporter',
+    "红星",
+    "transporter",
     new Date(time).getFullYear() +
-      '-' +
+      "-" +
       (new Date(time).getMonth() + 1) +
-      '-' +
+      "-" +
       new Date(time).getDate(),
     new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() +
-      '-' +
+      "-" +
       (new Date(time + 1 * 24 * 60 * 60 * 1000).getMonth() + 1) +
-      '-' +
+      "-" +
       new Date(time + 1 * 24 * 60 * 60 * 1000).getDate(),
     1,
     10000
   ).then(function (resp) {
-    total0.value = 0
+    total0.value = 0;
     for (let i = 0; i < resp.length; i++) {
-      total0.value = resp[i].netWeight + total0.value
+      total0.value = resp[i].netWeight + total0.value;
     }
-    total0.value = Math.floor((total0.value / 1000) * 100) / 100
+    total0.value = Math.floor((total0.value / 1000) * 100) / 100;
     //更改图表上对应位置的数据
-    smallOption.series[0].data[3].value = Number(total0.value.toFixed(0))
+    smallOption.series[0].data[3].value = Number(total0.value.toFixed(0));
+    hongxing = Number(total0.value.toFixed(0));
     getQuery(
-      '西华',
-      'transporter',
+      "西华",
+      "transporter",
       new Date(time).getFullYear() +
-        '-' +
+        "-" +
         (new Date(time).getMonth() + 1) +
-        '-' +
+        "-" +
         new Date(time).getDate(),
       new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() +
-        '-' +
+        "-" +
         (new Date(time + 1 * 24 * 60 * 60 * 1000).getMonth() + 1) +
-        '-' +
+        "-" +
         new Date(time + 1 * 24 * 60 * 60 * 1000).getDate(),
       1,
       10000
     ).then(function (resp) {
-      total0.value = 0
+      total0.value = 0;
       for (let i = 0; i < resp.length; i++) {
-        total0.value = resp[i].netWeight + total0.value
+        total0.value = resp[i].netWeight + total0.value;
       }
-      total0.value = Math.floor((total0.value / 1000) * 100) / 100
+      total0.value = Math.floor((total0.value / 1000) * 100) / 100;
+      xihua = Number(total0.value.toFixed(0));
+      // console.log(xihua)
       //更改图表上对应位置的数据
       smallOption.series[0].data[3].value =
-        Number(total0.value.toFixed(0)) +
-        smallOption.series[0].data[3].value -
-        smallOption.series[0].data[0].value -
-        smallOption.series[0].data[1].value -
-        smallOption.series[0].data[2].value
-
-      //更新页面上的图表
-      small_chart.setOption(smallOption)
-    })
-    //更新页面上的图表
-    small_chart.setOption(smallOption)
-  })
-}
+        xihua + hongxing - wukuaishi - honghuayan - wulidun;
+      // console.log(wukuaishi+"墩")
+      small_chart.setOption(smallOption);
+    });
+  });
+};
 
 // const ageGenderRequest = () => {
 
@@ -2954,92 +3075,98 @@ const create_small_data = () => {
  */
 
 //定义total
-const total1 = ref(2)
+const total1 = ref(2);
 //全局定义图表
-let renhe_chart = null
+let renhe_chart = null;
 
 //图表的基础模板
 let renheOption = {
   tooltip: {
-    trigger: 'item',
+    trigger: "item",
   },
   grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '3%',
+    left: "3%",
+    right: "4%",
+    bottom: "3%",
     containLabel: true,
   },
 
   series: [
     {
-      name: '垃圾净重量平均值',
+      name: "仁和星牛车辆",
       //设置图表类型是折线图
-      type: 'pie',
-      radius: '50%',
-      color: ['#f9c956', '#75bedc'],
+      type: "pie",
+      radius: "50%",
+      color: ["#f9c956", "#75bedc"],
       data: [
-        { value: 0, name: '在用' },
-        { value: 0, name: '停用' },
+        { value: 0, name: "在用" },
+        { value: 0, name: "停用" },
       ],
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
           shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)',
+          shadowColor: "rgba(0, 0, 0, 0.5)",
         },
       },
       label: {
-        overflow: 'none',
+        overflow: "none",
         show: true,
         // position: 'top',
         fontSize: fontSizeSwitch(0.15),
         //展示每个点的对应数值，这里必须是{c}才能显示数据
-        formatter: '{b}:{c} 辆 \n 占比：{d}%',
+        formatter: "{b}:{c} 辆 \n 占比：{d}%",
         //修改标签上的字体颜色
-        color: '#fff',
+        color: "#fff",
       },
     },
   ],
-}
+};
 
 /**
  * 获取后端数据，并动态展示在图表上
  */
 const create_renhe_data = () => {
-  let chartDom = document.getElementById('renhe_pie')
+  let chartDom = document.getElementById("renhe_pie");
   //初始化图表
-  renhe_chart = echarts.init(chartDom)
+  renhe_chart = echarts.init(chartDom);
+
+      renhe_chart.on('click', (params) => {
+      console.log("params:" + params.data.name);
+      renheVisible.value = true
+
+  })
 
   //绘制图表
-  renhe_chart.setOption(renheOption)
-  window.addEventListener('resize', renhe_chart.resize)
+  renhe_chart.setOption(renheOption);
+  window.addEventListener("resize", renhe_chart.resize);
 
   getAllGps().then((resp) => {
-    let num = 0
+    let num = 0;
     for (var car in resp) {
-      let gps_time = Date.parse(resp[car].exactDate.replace('T', ' '))
-      resp[car].carNumber = trim(resp[car].carNumber)
+      let gps_time = Date.parse(resp[car].exactDate.replace("T", " "));
+      resp[car].carNumber = trim(resp[car].carNumber);
       if (renhe_car.has(resp[car].carNumber.toUpperCase())) {
         if (gps_time + 4 * 60 * 60 * 1000 > time) {
-          num++
+          num++;
         }
       }
     }
-    renheOption.series[0].data[0].value = num
-    renheOption.series[0].data[1].value = renhe_car.size - num
+    renheOption.series[0].data[0].value = num;
+    renheOption.series[0].data[1].value = renhe_car.size - num;
     //更新页面上的图表
-    renhe_chart.setOption(renheOption)
-  })
-}
+    renhe_chart.setOption(renheOption);
+  });
+};
 
 //删除字符串中多余的空格
 function trim(ele) {
-  if (typeof ele === 'string') {
-    return ele.split(' ').join('')
+  if (typeof ele === "string") {
+    return ele.split(" ").join("");
   } else {
     console.error(
       `${typeof ele} is not the expected type, but the string type is expected`
-    )
+    );
   }
 }
 
@@ -3055,84 +3182,94 @@ function trim(ele) {
  */
 
 //定义total
-const total2 = ref(2)
+const total2 = ref(2);
 //全局定义图表
-let tianfu_chart = null
+let tianfu_chart = null;
 
 //图表的基础模板
 let tianfuOption = {
   tooltip: {
-    trigger: 'item',
+    trigger: "item",
   },
   grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '3%',
+    left: "3%",
+    right: "4%",
+    bottom: "3%",
     containLabel: true,
   },
-  color: ['#41C9CE', '#DC8D75'],
+  color: ["#41C9CE", "#DC8D75"],
   series: [
     {
-      name: '垃圾净重量平均值',
+      name: "天府环境车辆",
       //设置图表类型是折线图
-      type: 'pie',
-      radius: '50%',
+      type: "pie",
+      radius: "50%",
       data: [
-        { value: 0, name: '在用' },
-        { value: 0, name: '停用' },
+        { value: 0, name: "在用" },
+        { value: 0, name: "停用" },
       ],
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
           shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)',
+          shadowColor: "rgba(0, 0, 0, 0.5)",
         },
       },
       label: {
-        overflow: 'none',
+        overflow: "none",
         show: true,
         // position: 'top',
         fontSize: fontSizeSwitch(0.15),
         //展示每个点的对应数值，这里必须是{c}才能显示数据
-        formatter: '{b}:{c} 辆 \n 占比：{d}%',
+        formatter: "{b}:{c} 辆 \n 占比：{d}%",
         //修改标签上的字体颜色
-        color: '#fff',
+        color: "#fff",
       },
     },
   ],
-}
+};
 
 /**
  * 获取后端数据，并动态展示在图表上
  */
 const create_tianfu_data = () => {
-  let chartDom = document.getElementById('tianfu_pie')
+  let chartDom = document.getElementById("tianfu_pie");
   //初始化图表
-  tianfu_chart = echarts.init(chartDom)
+  tianfu_chart = echarts.init(chartDom);
+
+    tianfu_chart.on('click', (params) => {
+      console.log("params:" + params.data.name);
+      tianfuVisible.value = true
+
+  })
 
   //绘制图表
-  tianfu_chart.setOption(tianfuOption)
-  window.addEventListener('resize', tianfu_chart.resize)
+  tianfu_chart.setOption(tianfuOption);
+  window.addEventListener("resize", tianfu_chart.resize);
 
   getAllGps().then((resp) => {
-    let num = 0
+    let num = 0;
     for (var car in resp) {
-      let gps_time = Date.parse(resp[car].exactDate.replace('T', ' '))
-      resp[car].carNumber = trim(resp[car].carNumber)
+      let gps_time = Date.parse(resp[car].exactDate.replace("T", " "));
+      resp[car].carNumber = trim(resp[car].carNumber);
       if (tianfu_car.has(resp[car].carNumber.toUpperCase())) {
         if (gps_time + 4 * 60 * 60 * 1000 > time) {
-          num++
+          num++;
         }
       }
     }
 
-    tianfuOption.series[0].data[0].value = num
-    tianfuOption.series[0].data[1].value = tianfu_car.size - num
+    tianfuOption.series[0].data[0].value = num;
+    tianfuOption.series[0].data[1].value = tianfu_car.size - num;
     //更新页面上的图表
-    tianfu_chart.setOption(tianfuOption)
-  })
-}
+    tianfu_chart.setOption(tianfuOption);
+  });
+};
 
+// setInterval(() => {
+//   tianfu_chart.clear();
+//     tianfu_chart.setOption(tianfuOption)
+//   },3000)
 // =======================================================================================
 // =============================================================================sunny
 /**
@@ -3140,34 +3277,44 @@ const create_tianfu_data = () => {
  */
 //Dom挂载完毕，可以拿到组件渲染后的 DOM节点，展示图表
 onMounted(() => {
-  create_small_data()
-  create_category_data()
-  create_renhe_data()
-  create_tianfu_data()
-})
+  create_small_data();
+  create_category_data();
+
+  create_renhe_data();
+  create_tianfu_data();
+});
+setInterval(create_small_data, 60000);
+setInterval(create_category_data, 60000);
+setInterval(create_renhe_data, 60000);
+setInterval(create_tianfu_data, 60000);
+setInterval(getTianfuList(1), 60000);
+setInterval(getRenheList(1), 60000);
+// getTianfuList(1);
+// getRenheList(1);
+
 //Dom即将销毁，做一些清理操作
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', small_chart.resize)
+  window.removeEventListener("resize", small_chart.resize);
   if (small_chart) {
-    small_chart.dispose()
-    small_chart = null
+    small_chart.dispose();
+    small_chart = null;
   }
-  window.removeEventListener('resize', category_chart.resize)
+  window.removeEventListener("resize", category_chart.resize);
   if (category_chart) {
-    category_chart.dispose()
-    category_chart = null
+    category_chart.dispose();
+    category_chart = null;
   }
-  window.removeEventListener('resize', renhe_chart.resize)
+  window.removeEventListener("resize", renhe_chart.resize);
   if (renhe_chart) {
-    renhe_chart.dispose()
-    renhe_chart = null
+    renhe_chart.dispose();
+    renhe_chart = null;
   }
-  window.removeEventListener('resize', tianfu_chart.resize)
+  window.removeEventListener("resize", tianfu_chart.resize);
   if (tianfu_chart) {
-    tianfu_chart.dispose()
-    tianfu_chart = null
+    tianfu_chart.dispose();
+    tianfu_chart = null;
   }
-})
+});
 
 // ===========================================================================================================
 </script>
@@ -3346,7 +3493,7 @@ onBeforeUnmount(() => {
 
 #small_pie {
   /* padding-left: 0vw; */
-  height: 22vw;
+  height: 100%;
   width: 100%;
   margin-top: -7vh;
   opacity: 1;

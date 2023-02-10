@@ -1,10 +1,11 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHashHistory,createWebHistory } from "vue-router";
 
 //1.定义路由组件
 import Login from '@/views/Login.vue'
 import Home from '@/views/home/Home.vue'
 import Content from '@/views/content/Content.vue'
 import CarRecord from '@/views/content/components/CarRecord.vue'
+import CarDetailInfo from '@/views/content/components/CarDetailInfo.vue'
 
 //2.配置路由映射
 const routes = [
@@ -24,14 +25,18 @@ const routes = [
             path: 'map',//子组件的path不以/开头
             component: Home//() => import('@/views/home/components/MapView.vue')
         },
-
-
         ]
     },
+
+
     {
         name: 'content', path: '/content', component: Content,
         meta: { requestAuth: false },
         children: [
+                    {
+                name: 'carRecord', path: 'carRecord', component: CarRecord,
+                meta: { requestAuth: false },
+            },
             {
 
                 name: 'jinniu',
@@ -62,11 +67,12 @@ const routes = [
                 name: 'wulidun',
                 path: 'wulidun',//子组件的path不以/开头
                 component: () => import('@/views/content/components/Wulidun.vue')
+            },{
+                name: 'cardetailinfo',
+                path: 'cardetailinfo',//子组件的path不以/开头
+                component: CarDetailInfo
             },
-            {
-                name: 'carRecord', path: 'carRecord', component: CarRecord,
-                meta: { requestAuth: false },
-            }
+
         ]
     },
 
@@ -76,6 +82,9 @@ const routes = [
 //3.创建路由实例
 const router = createRouter({
     routes,
+    // 没有#号
+    // history: createWebHistory()
+    // 有#号
     history: createWebHashHistory()
 })
 

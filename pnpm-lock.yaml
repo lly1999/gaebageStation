@@ -13,6 +13,7 @@ specifiers:
   '@vuemap/vue-amap': ^1.1.8
   axios: ^0.27.2
   babel-polyfill: ^6.26.0
+  bootstrap: ^5.2.3
   core-js: ^3.8.3
   echarts: ^5.4.1
   element-plus: ^2.2.6
@@ -33,6 +34,7 @@ dependencies:
   '@vuemap/vue-amap': 1.1.20_vue@3.2.45
   axios: 0.27.2
   babel-polyfill: 6.26.0
+  bootstrap: 5.2.3
   core-js: 3.27.2
   echarts: 5.4.1
   element-plus: 2.2.28_y3dbsgppqv4jnxjxtdjaj42kje
@@ -2684,6 +2686,12 @@ packages:
   /boolbase/1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
     dev: true
+
+  /bootstrap/5.2.3:
+    resolution: {integrity: sha512-cEKPM+fwb3cT8NzQZYEu4HilJ3anCrWqh3CHAok1p9jXqMPsPTBhU25fBckEJHJ/p+tTxTFTsFQGM+gaHpi3QQ==}
+    peerDependencies:
+      '@popperjs/core': ^2.11.6
+    dev: false
 
   /brace-expansion/1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
