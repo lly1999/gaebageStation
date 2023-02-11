@@ -142,6 +142,9 @@ function refreshData() {
   })
 }
 setInterval(refreshData, 60000)
+
+
+
 onBeforeMount(() => {
   getQuery('红星', 'transporter', today, tomorrow, 1, 10000).then(function (resp) {
     total_hongxing.value = 0;
@@ -506,7 +509,7 @@ const config_xihua = reactive({
 
 }
 .card-title{
-  width:30%;
+  width:50%;
   margin:auto;
 }
 

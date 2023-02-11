@@ -6,7 +6,7 @@
       </h5>
     </el-header>
     <el-main>
-      <div class="card-header"></div>
+      <!-- <div class="card-header"></div> -->
       <!-- <div class="card-body"> -->
       <div>
         <h5 class="card-title" style="font-size: 25px; padding: 5px">
@@ -20,8 +20,9 @@
           />
         </div>
       </div>
-      <div class="data-view">
-        <div class="card-Left">
+      
+      <div class="data-view" style="width:100%;">
+        <div class="card-Left" style="width:40%;">
           <h5 class="card-title" style="font-size: 25px; padding: 5px">
             垃圾站当前报警
           </h5>
@@ -35,13 +36,14 @@
               {{ alert_tag.name }}
             </el-tag>
           </h4>
+          
           <dv-charts
             :option="config_alert"
             style="width: 95%; height: 35vh; margin: auto"
           />
         </div>
         <!-- ================================================================ sunny ========================================================sunny -->
-        <div class="card-Right">
+        <div class="card-Right" style="width:60%;">
           <h5 class="card-title" style="font-size: 25px; padding: 5px">
             过去一周各时段垃圾净重平均值统计
           </h5>
@@ -49,7 +51,7 @@
           <!-- <div id="avgTime_Line"></div> -->
           <dv-charts
             :option="avgTime_Line"
-            style="width: 95%; height: 35vh; margin: auto; padding-top: 5vh"
+            style="width: 95%; height: 35vh; margin: auto; padding-top: 4vh"
           />
         </div>
 
@@ -254,6 +256,7 @@ const config_alert = reactive({
   xAxis: {
     name: "日期",
     data: ["垃圾预测量", today + " 今日目前垃圾量"],
+    interval:100
   },
   yAxis: {
     name: "垃圾净重",
@@ -509,12 +512,12 @@ onBeforeMount(() => {
             var alert_status = Math.abs(yAxis_alert.value[0] - yAxis.value[6]);
 
             if (
-              alert_status < Number((yAxis_alert.value[0] * 0.2).toFixed(0))
+              alert_status <= Number((yAxis_alert.value[0] * 0.2))
             ) {
               alert_tag.value.type = "success";
               alert_tag.value.name = "正常";
             } else if (
-              alert_status >= Number((yAxis_alert.value[0] * 0.2).toFixed(0))
+              alert_status > Number((yAxis_alert.value[0] * 0.2))
             ) {
               var alert_status_signed = yAxis_alert.value[0] - yAxis.value[6];
               console.log(alert_status_signed);
@@ -949,28 +952,4 @@ const handleEdit = (index, row) => {
 // ===========================================================================================================
 </script>
 
-<style>
-.data-view {
-  width: 100%;
-  /* display: flex; */
-  height: 422px;
-  /* justify-content:space-between; */
-}
-.card-Left {
-  width: 400px;
-  height: 422px;
-}
-.card-Right {
-  width: 60%;
-  height: 422px;
-  /* padding-left:2vw; */
-}
-#avgTime_Line {
-  /* padding-left:2vw; */
-  height: 422px;
-  width: 90%;
-}
-.card-body {
-  width: 100%;
-}
-</style>
+
