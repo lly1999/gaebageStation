@@ -7,7 +7,9 @@ import VueAMap, { initAMapApiLoader } from '@vuemap/vue-amap';
 import '@vuemap/vue-amap/dist/style.css'
 import VueTianditu from "vue-tianditu";
 import DataVVue3 from '@kjgl77/datav-vue3'
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+// import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+
+
 initAMapApiLoader({
     key: '61ad75101d54a5371d872c69fdce0d3f'
 })
@@ -19,6 +21,8 @@ import * as echarts from 'echarts';
 // Vue.prototype.$echarts = echarts;
 //vue3.0版本
 //app.config.globalProperties.$echarts = echarts;
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import 'dayjs/locale/zh-cn';
 
 
 
@@ -27,7 +31,7 @@ import * as echarts from 'echarts';
 createApp(App)
     .use(router)
     .use(ElementPlus, {
-        locale: zhCn,
+          locale: zhCn,
     })
     .use(VueAMap)
     .use(DataVVue3)

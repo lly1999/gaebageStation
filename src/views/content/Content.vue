@@ -1,5 +1,5 @@
 <template>
-  <el-container class="container">
+  <el-container class="dcontainer">
     <!-- 导航栏 -->
     <Header style="height:70px " :icon="null">
 

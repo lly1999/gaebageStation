@@ -1,18 +1,29 @@
 <template>
   <div class="container">
-
-
+    <div class="row">
+      <div class="col-sm-4 col-md-3">
+        <div class="card person-basic-img">
+          <div class="card-body">
+            <img
+              class="img-responsive"
+              src="@/assets/img/default-person.png"
+              alt=""
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-7 col-md-8">
         <div class="card person-basic-info">
-          <div class="card-header" style="width:10%;margin:auto">
+          <div class="card-header">
             车辆信息
-            <!-- <div class="float-end">
+            <div class="float-end">
               <el-button type="info" @click="patrolLocation()"
                 >跳转定位</el-button
               >
               <el-button type="info" @click="selectDate()">轨迹查询</el-button>
-            </div> -->
+            </div>
           </div>
-          <div class="card-body info-box" style="width: 40%;margin-top:10vh">
+          <div class="card-body info-box" style="width: 60%; margin-top: 8vh;margin-bottom: 7vh;">
             <el-form
               :model="detail_info"
               label-position="right"
@@ -21,7 +32,7 @@
               :disabled="true"
               size="large"
             >
-              <el-form-item label="车牌号" >
+              <el-form-item label="车牌号">
                 <el-input
                   style="cursor: text"
                   class="info-input"
@@ -48,6 +59,8 @@
             </el-form>
           </div>
         </div>
+      </div>
+    </div>
 
     <!-- <el-dialog v-model="selectDateDialogVisable" title="日期选择" width="30%"
             :before-close="handleSelectDateDialogClose">
@@ -75,6 +88,7 @@ import { getCarGps } from "@/api/content";
 import { getCarsLocation } from "@/api/home";
 import { ElMessage, ElDialog, tabBarProps } from "element-plus";
 import { useRoute } from "vue-router";
+
 const carValue = ref("川ABS126");
 const carData = ref([]);
 const carList = ref([]);
@@ -85,9 +99,19 @@ const route = useRoute();
 var renhe_car = new Map();
 var tianfu_car = new Map();
 
-var time = (new Date).getTime();
-const today = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate()
-const tomorrow = new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() + '-' + (new Date(time + 1 * 24 * 60 * 60 * 1000).getMonth() + 1) + '-' + (new Date(time + 1 * 24 * 60 * 60 * 1000).getDate())
+var time = new Date().getTime();
+const today =
+  new Date().getFullYear() +
+  "-" +
+  (new Date().getMonth() + 1) +
+  "-" +
+  new Date().getDate();
+const tomorrow =
+  new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() +
+  "-" +
+  (new Date(time + 1 * 24 * 60 * 60 * 1000).getMonth() + 1) +
+  "-" +
+  new Date(time + 1 * 24 * 60 * 60 * 1000).getDate();
 
 onBeforeMount(() => {
   getCars().then(function (resp) {
@@ -112,16 +136,15 @@ onBeforeMount(() => {
     }
   });
   //删除字符串中多余的空格
-function trim(ele) {
-  if (typeof ele === "string") {
-    return ele.split(" ").join("");
-  } else {
-    console.error(
-      `${typeof ele} is not the expected type, but the string type is expected`
-    );
+  function trim(ele) {
+    if (typeof ele === "string") {
+      return ele.split(" ").join("");
+    } else {
+      console.error(
+        `${typeof ele} is not the expected type, but the string type is expected`
+      );
+    }
   }
-}
-
 });
 
 let detail_info = reactive({
@@ -133,26 +156,24 @@ let detail_info = reactive({
 });
 
 const getPersonInfo = () => {
-    if (route.query.carNumber) {
-        var carNumber = route.query.carNumber;
-        console.log("车牌号："+carNumber)
-    getCarGps(carNumber, today, tomorrow).then(resp =>{ 
-        console.log("长度："+resp.length);
-        // let patrol = response.data.data;
-        detail_info.carNumber = resp[resp.length-1].carNumber;
-        detail_info.name = "待完善";
-        detail_info.telephone = "待完善";
-        console.log(resp[resp.length-1].carNumber)
-        // detail_info.company = resp[resp.length-1].company;
-        detail_info.lastTime = resp[resp.length - 1].exactDate;
-        // 车辆对应的公司
-        if (renhe_car.has(carNumber.toUpperCase())) {
-                detail_info.company = renhe_car.get(carNumber.toUpperCase()); 
-        } else if (tianfu_car.has(carNumber.toUpperCase())) {
-            detail_info.company = tianfu_car.get(carNumber.toUpperCase());
-        }
-        
-      
+  if (route.query.carNumber) {
+    var carNumber = route.query.carNumber;
+    console.log("车牌号：" + carNumber);
+    getCarGps(carNumber, today, tomorrow).then((resp) => {
+      console.log("长度：" + resp.length);
+      // let patrol = response.data.data;
+      detail_info.carNumber = resp[resp.length - 1].carNumber;
+      detail_info.name = "待完善";
+      detail_info.telephone = "待完善";
+      console.log(resp[resp.length - 1].carNumber);
+      // detail_info.company = resp[resp.length-1].company;
+      detail_info.lastTime = resp[resp.length - 1].exactDate;
+      // 车辆对应的公司
+      if (renhe_car.has(carNumber.toUpperCase())) {
+        detail_info.company = renhe_car.get(carNumber.toUpperCase());
+      } else if (tianfu_car.has(carNumber.toUpperCase())) {
+        detail_info.company = tianfu_car.get(carNumber.toUpperCase());
+      }
     });
   }
 };
@@ -160,9 +181,9 @@ const getPersonInfo = () => {
 getPersonInfo();
 </script>
 <style scoped>
-/* .container {
-    margin-left: 16vw;
-} */
+/* .container { */
+    /* margin-left: 16vw; */
+/* } */
 
 .person-basic-info {
     margin-top: 8vh;
@@ -173,10 +194,8 @@ getPersonInfo();
 }
 
 .info-box {
-    /* margin-left: 7vw;
-    margin-right: 7vw; */
-    margin:auto;
-
+    margin-left: 7vw;
+    margin-right: 7vw;
 }
 
 .case-box {
@@ -188,9 +207,7 @@ getPersonInfo();
 }
 
 .card-header {
-    /* width:100%; */
     font-size: 1.5rem;
-    /* text-align: auto; */
 }
 
 
@@ -205,7 +222,7 @@ getPersonInfo();
 }
 
 :deep(.el-form-item__label) {
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 :deep(.is-disabled .el-input__inner) {
