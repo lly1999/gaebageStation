@@ -16,12 +16,12 @@
         <div class="card person-basic-info">
           <div class="card-header">
             车辆信息
-            <div class="float-end">
+            <!-- <div class="float-end">
               <el-button type="info" @click="patrolLocation()"
                 >跳转定位</el-button
               >
               <el-button type="info" @click="selectDate()">轨迹查询</el-button>
-            </div>
+            </div> -->
           </div>
           <div class="card-body info-box" style="width: 60%; margin-top: 8vh;margin-bottom: 7vh;">
             <el-form
@@ -88,7 +88,7 @@ import { getCarGps } from "@/api/content";
 import { getCarsLocation } from "@/api/home";
 import { ElMessage, ElDialog, tabBarProps } from "element-plus";
 import { useRoute } from "vue-router";
-
+import moment from "moment";
 const carValue = ref("川ABS126");
 const carData = ref([]);
 const carList = ref([]);
@@ -154,26 +154,29 @@ let detail_info = reactive({
   company: "",
   lastTime: "",
 });
-
+var cardetail_today;
 const getPersonInfo = () => {
   if (route.query.carNumber) {
     var carNumber = route.query.carNumber;
-    console.log("车牌号：" + carNumber);
-    getCarGps(carNumber, today, tomorrow).then((resp) => {
-      console.log("长度：" + resp.length);
-      // let patrol = response.data.data;
-      detail_info.carNumber = resp[resp.length - 1].carNumber;
+          detail_info.carNumber = carNumber;
       detail_info.name = "待完善";
       detail_info.telephone = "待完善";
-      console.log(resp[resp.length - 1].carNumber);
-      // detail_info.company = resp[resp.length-1].company;
-      detail_info.lastTime = resp[resp.length - 1].exactDate;
-      // 车辆对应的公司
-      if (renhe_car.has(carNumber.toUpperCase())) {
-        detail_info.company = renhe_car.get(carNumber.toUpperCase());
-      } else if (tianfu_car.has(carNumber.toUpperCase())) {
-        detail_info.company = tianfu_car.get(carNumber.toUpperCase());
+
+    getCars().then(function (resp) {
+      for (let i = 0; i < resp.length; i++) {
+        if (carNumber == resp[i].carNumber) {
+          detail_info.company = resp[i].company;
+        }
       }
+    })
+cardetail_today=moment()
+        .add(-5, "d")
+        .format("YYYY-MM-DD");
+        console.log("这个月前一天"+cardetail_today)
+    getCarGps(carNumber, cardetail_today, tomorrow).then((resp) => {
+
+      detail_info.lastTime = resp[resp.length - 1].exactDate;
+
     });
   }
 };

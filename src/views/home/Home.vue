@@ -656,7 +656,6 @@ const getTianfuList = (page) => {
           num++;
         }
       }
-
     }
     var gong = 0;
     tianfu_car.forEach((val, key) => {
