@@ -1,6 +1,6 @@
 <template>
-  <el-container class="container">
-    <Header style="height: 70px" :icon="null">
+  <el-container class="dcontainer">
+    <Header style="height: 7%" :icon="null">
       <!-- 系统名字 -->
       <template #title>
         <span class="text-title">金牛区生活垃圾全生命周期管家</span>
@@ -46,8 +46,8 @@
         :center="state.center"
         :zoom="state.zoom"
         mapStyle="black"
-        :scrollWheelZoom="state.doubleClickZoom"
-        :doubleClickZoom="state.doubleClickZoom"
+        :doubleClickZoom="true"
+        :scrollWheelZoom="true"
         :controls="state.controls"
       >
         <!-- 设置控件 -->
@@ -91,7 +91,7 @@
               </h5>
               <div
                 class="card-body"
-                style="padding-top: 10px; width: 25vw; height: 35vh"
+                style="padding-top: 10px; width: 23vw; height: 35vh"
               >
                 <div id="small_pie"></div>
               </div>
@@ -256,6 +256,8 @@
               <tdt-map
                 :center="car.location"
                 :zoom="state.zoom"
+                :scrollWheelZoom="true"
+                :doubleClickZoom="state.doubleClickZoom"
                 mapStyle="black"
               >
                 <tdt-marker
@@ -332,7 +334,7 @@
                   font-weight: bold;
                 "
               >
-                仁和星牛的车辆活动情况列表
+                过去4小时内仁和星牛的车辆活动情况列表
               </div>
               <el-table
                 :data="
@@ -411,7 +413,7 @@
                   font-weight: bold;
                 "
               >
-                天府环境的车辆活动情况列表
+                过去4小时内天府环境的车辆活动情况列表
               </div>
               <el-table
                 :data="
@@ -483,6 +485,7 @@
 
 <script setup>
 // ==========================================================================================================sunny
+
 // 导入echarts
 import * as echarts from "echarts";
 // 从vue库中引包需要声明
@@ -653,7 +656,6 @@ const getTianfuList = (page) => {
           num++;
         }
       }
-
     }
     var gong = 0;
     tianfu_car.forEach((val, key) => {
@@ -2844,8 +2846,9 @@ let smallOption = {
       axisTick: {
         alignWithLabel: true,
       },
+      interval:0,
       axisLabel: {
-        fontSize: fontSizeSwitch(0.18),
+        fontSize: fontSizeSwitch(0.15),
         show: true,
         textStyle: {
           color: "#fff",
@@ -2894,7 +2897,7 @@ let smallOption = {
         overflow: "none",
         show: true,
         // position: 'top',
-        fontSize: fontSizeSwitch(0.15),
+        fontSize: fontSizeSwitch(0.12),
         //展示每个点的对应数值，这里必须是{c}才能显示数据
         formatter: "{b}:{c} 吨",
         //修改标签上的字体颜色

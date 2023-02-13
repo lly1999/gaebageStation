@@ -1,7 +1,8 @@
 /* 子系统的通用样式 */
-.container{
+.dcontainer{
     display: flex;
     flex-direction: column;
+    /* width:100%; */
     height: 100%;
   }
   .logo-title {

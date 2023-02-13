@@ -6,7 +6,8 @@ import Home from '@/views/home/Home.vue'
 import Content from '@/views/content/Content.vue'
 import CarRecord from '@/views/content/components/CarRecord.vue'
 import CarDetailInfo from '@/views/content/components/CarDetailInfo.vue'
-
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap.min.js'
 //2.配置路由映射
 const routes = [
     {

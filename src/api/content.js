@@ -2,7 +2,7 @@ import request from '@/utils/request'
 export { get } from '@/api/common.js'
 export function getPage(pageNum, pageSize) {
     return request({
-        url: '/dump-record/page/',
+        url: '/dump-record/page',
         method: 'get',
         data: {
             pageNum: pageNum,
@@ -44,6 +44,26 @@ export function getCars(){
 }
 
 export function getAllGps(){
+    return request({
+        url: '/gps-record/latest_location/all'+'/',
+        method: 'get'
+    })
+}
+
+
+// 车辆倾倒数据查询;若需全部站点数据,则site_name填all
+export function getTransportCars(start, end,site_name, pageNum, pageSize) {
+    return request({
+        url: '/dump-record/dump_car/' + start + '/' + end + '/' + site_name + '/' + pageNum + '/' + pageSize,
+        method: 'get',
+        // params: {
+        //     pageNum: pageNum,
+        //     pageSize: pageSize		//user_id为接口请求关键字,7为参数值
+        // }
+    })
+}
+
+export function getAllGp(){
     return request({
         url: '/gps-record/latest_location/all'+'/',
         method: 'get'

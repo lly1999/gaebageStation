@@ -6,8 +6,64 @@
       </h5>
     </el-header>
     <el-main>
-      <!-- <div class="card-header"></div> -->
-      <!-- <div class="card-body"> -->
+      <div class="site_name-header">
+        <h5 class="card-title" style="font-size: 25px; padding: 5px">
+          垃圾量统计(日/周/月)
+        </h5>
+        <div class="site_name-header-search">
+          <el-select
+            v-model="site_name_select_way"
+            class="m-2"
+            placeholder="选择查询方式"
+            clearable
+            size="large"
+          >
+            <el-option
+              v-for="item in site_name_option"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+
+          <el-date-picker
+            v-if="site_name_select_way == 'week'"
+            v-model="site_name_select_value"
+            type="week"
+            format="[Week] ww"
+            placeholder="请选择某一周"
+            size="large"
+          />
+          <el-date-picker
+            v-if="site_name_select_way == 'month'"
+            v-model="site_name_select_value"
+            type="month"
+            placeholder="请选择某个月"
+            size="large"
+          />
+
+          <el-date-picker
+            v-if="site_name_select_way == 'day'"
+            v-model="site_name_select_value"
+            type="date"
+            placeholder="请选择日期"
+            size="large"
+          />
+
+          <el-button
+            v-if="site_name_select_way != ''"
+            type="primary"
+            :icon="Search"
+            @click="search_site_name"
+            size="large"
+            >搜索
+          </el-button>
+          <dv-charts
+            :option="site_name_total"
+            style="width: 95%; height: 40vh; margin: auto"
+          />
+        </div>
+      </div>
       <div>
         <h5 class="card-title" style="font-size: 25px; padding: 5px">
           垃圾趋势统计
@@ -20,9 +76,9 @@
           />
         </div>
       </div>
-      
-      <div class="data-view" style="width:100%;">
-        <div class="card-Left" style="width:40%;">
+
+      <div class="data-view" style="width: 100%">
+        <div class="card-Left" style="width: 40%">
           <h5 class="card-title" style="font-size: 25px; padding: 5px">
             垃圾站当前报警
           </h5>
@@ -36,14 +92,14 @@
               {{ alert_tag.name }}
             </el-tag>
           </h4>
-          
+
           <dv-charts
             :option="config_alert"
             style="width: 95%; height: 35vh; margin: auto"
           />
         </div>
         <!-- ================================================================ sunny ========================================================sunny -->
-        <div class="card-Right" style="width:60%;">
+        <div class="card-Right" style="width: 60%">
           <h5 class="card-title" style="font-size: 25px; padding: 5px">
             过去一周各时段垃圾净重平均值统计
           </h5>
@@ -51,7 +107,7 @@
           <!-- <div id="avgTime_Line"></div> -->
           <dv-charts
             :option="avgTime_Line"
-            style="width: 95%; height: 35vh; margin: auto; padding-top: 4vh"
+            style="width: 95%; height: 39vh; margin: auto; padding-top: 4vh"
           />
         </div>
 
@@ -73,6 +129,7 @@
           size="large"
         />
         <!-- <el-button @click="excuteQuery" size="large" type="primary" style="padding:20px">查询</el-button> -->
+
         <el-table :data="data" :size="large" width="100%">
           <el-table-column
             property="exactDate"
@@ -124,7 +181,101 @@
           @current-change="pull_page"
         />
       </div>
-      <!-- </div> -->
+      <div class="car-transport-header" style="margin-top: 8vh">
+        <h5 class="card-title" style="font-size: 25px; padding: 5px">
+          运输垃圾的车辆列表
+        </h5>
+        <div class="car-transport-header-search">
+          <el-input
+            style="width: 18%"
+            class="select-text-box"
+            v-model="queryCarNum"
+            placeholder="请输入车牌号"
+            clearable
+            size="large"
+          >
+          </el-input>
+          <el-select
+            v-model="car_transport_select_way"
+            class="m-2"
+            placeholder="选择查询方式"
+            clearable
+            size="large"
+          >
+            <el-option
+              v-for="item in car_transport_option"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+          <el-date-picker
+            v-if="car_transport_select_way == 'week'"
+            v-model="car_transport_select_value"
+            type="week"
+            format="[Week] ww"
+            placeholder="请选择某一周"
+            size="large"
+            @change="search_car_transport"
+          />
+          <el-date-picker
+            v-if="car_transport_select_way == 'month'"
+            v-model="car_transport_select_value"
+            type="month"
+            placeholder="请选择某个月"
+            size="large"
+            @change="search_car_transport"
+          />
+
+          <el-date-picker
+            v-if="car_transport_select_way == 'day'"
+            v-model="car_transport_select_value"
+            type="date"
+            placeholder="请选择日期"
+            size="large"
+            @change="search_car_transport"
+          />
+          <el-button type="primary" size="large" @click="exportExcels"
+            >导出</el-button
+          >
+        </div>
+
+        <el-table
+          :data="data_total.slice((currentPage - 1) * 10, currentPage * 10)"
+          :size="large"
+          width="100%"
+          id="#vcfResult"
+        >
+          <el-table-column property="day" label="时间" width="300px" />
+          <el-table-column property="siteName" label="站点" width="150" />
+          <el-table-column property="carNumber" label="承运车辆" width="150">
+          </el-table-column>
+          <el-table-column property="frequency" label="运输次数" width="150" />
+          <el-table-column
+            property="totalWeight"
+            label="运输总量/kg"
+            width="150"
+          />
+          <el-table-column
+            property="avgWeight"
+            label="单次平均运输量/kg"
+            width="200"
+          />
+
+          <el-table-column property="driver" label="司机" width="300" />
+          <el-table-column property="tel" label="司机电话" width="300" />
+          <el-table-column property="wechat" label="司机微信" width="300" />
+        </el-table>
+      </div>
+      <div class="float-end" style="margin-top: 10px">
+        <el-pagination
+          background
+          layout="total, prev, pager, next, jumper"
+          :total="totalRecords"
+          :current-page="currentPage"
+          @current-change="getTransport"
+        />
+      </div>
     </el-main>
   </el-container>
 </template>
@@ -133,6 +284,9 @@ import { useRouter, useRoute } from "vue-router";
 import Charts from "@jiaminghi/charts";
 import { House, ArrowDown, Setting, Link } from "@element-plus/icons-vue";
 import Header from "@/components/Header.vue";
+
+
+
 // ==========================================================================================================sunny
 import {
   ref,
@@ -144,10 +298,428 @@ import {
 } from "vue";
 //===============================================================================================================
 import axios from "axios";
-import { getPage, getQuery } from "@/api/content.js";
+import {
+  getPage,
+  getQuery,
+  getAllGp,
+  getTransportCars,
+} from "@/api/content.js";
+
 // ==========================================================================================================sunny
 // 导入echarts
 import * as echarts from "echarts";
+
+import { useStore } from "vuex";
+import * as XLSX from "xlsx";
+import { ElMessage } from "element-plus";
+import moment from "moment";
+
+const store = useStore();
+let total_records = ref(1000);
+let current_page = ref(1);
+let page_count = 0;
+
+let totalRecords = ref(1000);
+let currentPage = ref(1);
+let pageCount = 0;
+const data = ref([]);
+// const data_total = ref([]);
+const queryCarNum = ref("");
+
+let car_transport_select_way = ref("");
+let car_transport_select_value = ref("");
+let site_name_select_way = ref("");
+let site_name_select_value = ref("");
+
+const car_transport_option = [
+  {
+    value: "day",
+    label: "按天查询",
+  },
+  {
+    value: "week",
+    label: "按周查询",
+  },
+  {
+    value: "month",
+    label: "按月查询",
+  },
+];
+const site_name_option = [
+  {
+    value: "day",
+    label: "按天查询",
+  },
+  {
+    value: "week",
+    label: "按周查询",
+  },
+  {
+    value: "month",
+    label: "按月查询",
+  },
+];
+
+var json_data = ref();
+var start = ref("");
+var end = ref("");
+const transport_today =
+  new Date().getFullYear() +
+  "-" +
+  (new Date().getMonth() + 1) +
+  "-" +
+  new Date().getDate();
+var transport_start = transport_today;
+console.log("transport_start" + transport_start);
+const search_car_transport = () => {
+  var carNumber = "all";
+  if (queryCarNum.value.trim() != "") {
+    carNumber = queryCarNum.value.trim();
+  }
+
+  console.log("查到的值：" + carNumber);
+  if (car_transport_select_value.value == "") {
+    ElMessage({
+      message: "请选择相应日期",
+      type: "error",
+    });
+  } else {
+    var d = new Date(car_transport_select_value.value);
+    var start_day =
+      d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+    start = start_day;
+    var month = d.getMonth() + 1;
+    if (car_transport_select_way.value == "day") {
+      end = start_day;
+    }
+    if (car_transport_select_way.value == "week") {
+      const endTime = new Date(
+        new Date(car_transport_select_value.value).getTime() +
+          3600 *
+            1000 *
+            24 *
+            (6 - new Date(car_transport_select_value.value).getDay())
+      );
+      end = moment(endTime).format("YYYY-MM-DD");
+    }
+    if (car_transport_select_way.value == "month") {
+      const end_month = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+      end = moment(end_month).format("YYYY-MM-DD");
+    }
+
+    getTransportList(start, end, "西华", 1, 10000, carNumber);
+    car_transport_select_way.value = "";
+  }
+};
+const data_total = reactive([]);
+var renhe_car = new Map();
+const getTransportList = (
+  start,
+  end,
+  site_name,
+  pageNum,
+  pageSize,
+  carNumber
+) => {
+  axios({
+    url:
+      "/api/dump-record/dump_car/" +
+      start +
+      "/" +
+      end +
+      "/" +
+      site_name +
+      "/" +
+      pageNum +
+      "/" +
+      pageSize,
+
+    method: "get",
+  }).then(function (resp) {
+    if (resp.status == 200) {
+      data_total.splice(0, data_total.length);
+      var data = resp.data.data.records;
+
+      if (carNumber == "all") {
+        for (var car in data) {
+          var currentCar = {
+            day: start + " 至 " + end,
+            siteName: data[car].siteName,
+            carNumber: data[car].carNumber,
+            avgWeight: data[car].avgWeight,
+            frequency: data[car].frequency,
+            totalWeight: data[car].totalWeight,
+          };
+          data_total.push(currentCar);
+          json_data.value = data_total;
+        }
+      } else {
+        for (var car in data) {
+          if (carNumber == data[car].carNumber) {
+            var currentCar = {
+              day: start + " 至 " + end,
+              siteName: data[car].siteName,
+              carNumber: data[car].carNumber,
+              avgWeight: data[car].avgWeight,
+              frequency: data[car].frequency,
+              totalWeight: data[car].totalWeight,
+            };
+            data_total.push(currentCar);
+
+            json_data.value = data_total;
+          }
+        }
+      }
+      console.log("数据长度：" + data.length);
+      totalRecords.value = data.length;
+      pageCount = parseInt(data.length) % 10;
+      currentPage.value = pageNum;
+    }
+  });
+};
+
+getTransportList(transport_start, transport_start, "西华", 1, 10000, "all");
+
+const getTransport = (pageNum) => {
+  // 当前页
+  currentPage.value = pageNum;
+};
+
+const exportExcels = () => {
+  const titleArr = [
+    "时间",
+    "站点名称",
+    "车牌号",
+    "运输次数",
+    "运输总量/kg",
+    "单次平均运输量/kg",
+  ]; //表头中文名
+  exportExcel(
+    json_data.value,
+    "西华站运输垃圾的车辆列表 ",
+    titleArr,
+    "sheetName"
+  );
+};
+
+function exportExcel(json, name, titleArr, sheetName) {
+  /* convert state to workbook */
+  var data = new Array();
+  var keyArray = new Array();
+  const getLength = function (obj) {
+    var count = 0;
+    for (var i in obj) {
+      if (obj.hasOwnProperty(i)) {
+        count++;
+      }
+    }
+    return count;
+  };
+  for (const key1 in json) {
+    if (json.hasOwnProperty(key1)) {
+      const element = json[key1];
+      var rowDataArray = new Array();
+      for (const key2 in element) {
+        if (element.hasOwnProperty(key2)) {
+          const element2 = element[key2];
+          rowDataArray.push(element2);
+          if (keyArray.length < getLength(element)) {
+            keyArray.push(key2);
+          }
+        }
+      }
+      data.push(rowDataArray);
+    }
+  }
+  // keyArray为英文字段表头
+  data.splice(0, 0, keyArray, titleArr);
+  console.log("data", data);
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  // 此处隐藏英文字段表头
+  var wsrows = [{ hidden: true }];
+  ws["!rows"] = wsrows; // ws - worksheet
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  /* generate file and send to client */
+  XLSX.writeFile(wb, name + ".xlsx");
+}
+
+// =============================================================================sunny
+const site_name_yAxis = ref([0, 0, 0, 0, 0]);
+const site_name_date = ref(["0", 0, 0, 0, 0]);
+var today_time = moment().format("YYYY-MM-DD");
+site_name_date.value[0] = moment().add(-2, "d").format("YYYY-MM-DD");
+site_name_date.value[1] = moment().add(-1, "d").format("YYYY-MM-DD");
+site_name_date.value[2] = today_time;
+site_name_date.value[3] = moment().add(+1, "d").format("YYYY-MM-DD");
+site_name_date.value[4] = moment().add(+2, "d").format("YYYY-MM-DD");
+
+const site_name_sum = ref(0);
+// 过去一周各时段垃圾净重平均值统计
+const site_name_total = reactive({
+  title: {
+    text: "西华站垃圾总量",
+  },
+  xAxis: {
+    name: "日期",
+    data: site_name_date,
+  },
+  yAxis: {
+    name: "垃圾净重",
+    data: "value",
+    min: 0,
+    // maxinterval: 1000,
+  },
+  series: [
+    {
+      data: site_name_yAxis,
+      type: "bar",
+      label: {
+        show: true,
+        formatter: "{value} 吨",
+      },
+    },
+  ],
+});
+
+// =====================================================================================
+// 站点天，周，月，季度统计
+const search_site_name = () => {
+  var start;
+  var end;
+  if (site_name_select_value.value == "") {
+    ElMessage({
+      message: "请选择相应日期",
+      type: "error",
+    });
+  } else {
+    var d = new Date(site_name_select_value.value);
+    var start_day =
+      d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+
+    if (site_name_select_way.value == "day") {
+      site_name_date.value[0] = moment(start_day)
+        .add(-2, "d")
+        .format("YYYY-MM-DD");
+      site_name_date.value[1] = moment(start_day)
+        .add(-1, "d")
+        .format("YYYY-MM-DD");
+      site_name_date.value[2] = start_day;
+      site_name_date.value[3] = moment(start_day)
+        .add(+1, "d")
+        .format("YYYY-MM-DD");
+      site_name_date.value[4] = moment(start_day)
+        .add(+2, "d")
+        .format("YYYY-MM-DD");
+      for (var date = 0; date < 5; date++) {
+        getSiteNameList(
+          site_name_date.value[date],
+          site_name_date.value[date],
+          "西华",
+          1,
+          10000,
+          date
+        );
+      }
+      site_name_date.value[2] = "当天：" + site_name_date.value[2];
+    }
+    if (site_name_select_way.value == "week") {
+      site_name_date.value[0] = moment(start_day).day(-14).format("YYYY-MM-DD");
+      site_name_date.value[1] = moment(start_day).day(-7).format("YYYY-MM-DD");
+      site_name_date.value[2] = moment(start_day).day(0).format("YYYY-MM-DD");
+      site_name_date.value[3] = moment(start_day).day(7).format("YYYY-MM-DD");
+      site_name_date.value[4] = moment(start_day).day(14).format("YYYY-MM-DD");
+      for (var date = 0; date < 5; date++) {
+        start = site_name_date.value[date];
+        end = moment(site_name_date.value[date]).day(6).format("YYYY-MM-DD");
+        getSiteNameList(start, end, "西华", 1, 10000, date);
+        site_name_date.value[date] = start + " 至 " + end;
+      }
+      site_name_date.value[2] = "当周：" + site_name_date.value[2];
+    }
+    if (site_name_select_way.value == "month") {
+      site_name_date.value[0] = moment(start_day)
+        .month(moment(start_day).month() - 2)
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      site_name_date.value[1] = moment(start_day)
+        .month(moment(start_day).month() - 1)
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      site_name_date.value[2] = moment(start_day)
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      site_name_date.value[3] = moment(start_day)
+        .month(moment(start_day).month() + 1)
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      site_name_date.value[4] = moment(start_day)
+        .month(moment(start_day).month() + 2)
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      for (var date = 0; date < 5; date++) {
+        start = site_name_date.value[date];
+        end = moment(site_name_date.value[date])
+          .endOf("month")
+          .format("YYYY-MM-DD");
+        getSiteNameList(start, end, "西华", 1, 10000, date);
+        site_name_date.value[date] = moment(site_name_date.value[date])
+          .startOf("month")
+          .format("YYYY-MM");
+      }
+      site_name_date.value[2] = "当月：" + site_name_date.value[2];
+    }
+    // console.log("查询到的日期：" + start_day);
+
+    // getSiteNameList(start, end, "西华", 1, 10000);
+    site_name_select_way.value = "";
+  }
+};
+
+const getSiteNameList = (start, end, site_name, pageNum, pageSize, date) => {
+  axios({
+    url:
+      "/api/dump-record/dump_car/" +
+      start +
+      "/" +
+      end +
+      "/" +
+      site_name +
+      "/" +
+      pageNum +
+      "/" +
+      pageSize,
+
+    method: "get",
+  }).then(function (resp) {
+    if (resp.status == 200) {
+      var data = resp.data.data.records;
+      site_name_sum.value = 0;
+      for (let i = 0; i < data.length; i++) {
+        site_name_sum.value = data[i].totalWeight + site_name_sum.value;
+      }
+
+      site_name_sum.value =
+        Math.floor((site_name_sum.value / 1000) * 100) / 100;
+      console.log("总量：" + Number(site_name_sum.value.toFixed(0)));
+
+      site_name_yAxis.value[date] = Number(site_name_sum.value.toFixed(0));
+    }
+  });
+};
+const recent_days_total = (site_name_date) => {
+  for (var date = 0; date < 5; date++) {
+    getSiteNameList(
+      site_name_date.value[date],
+      site_name_date.value[date],
+      "西华",
+      1,
+      10000,
+      date
+    );
+  }
+};
+recent_days_total(site_name_date);
 
 //===============================================================================================================
 
@@ -195,16 +767,16 @@ function changeDate() {
     (value.value[1].getMonth() + 1) +
     "-" +
     value.value[1].getDate();
-  getQuery("西华", "transporter", start, end, 1, 10000).then(function (resp) {
-    total_records.value = resp.length;
+  // getQuery("西华", "transporter", start, end, 1, 10000).then(function (resp) {
+  //   total_records.value = resp.length;
 
-    console.log((total_records.value = resp.length));
-    page_count = parseInt(resp.length) % 10;
-    // patrols.value.splice(0, patrols.value.length);
-    // total_records.value = parseInt(resp.total);
-    // page_count = parseInt(resp.data.data.pages);
-    // ifShowQueryResult.value = false;
-  });
+  //   console.log((total_records.value = resp.length));
+  //   page_count = parseInt(resp.length) % 10;
+  //   // patrols.value.splice(0, patrols.value.length);
+  //   // total_records.value = parseInt(resp.total);
+  //   // page_count = parseInt(resp.data.data.pages);
+  //   // ifShowQueryResult.value = false;
+  // });
   getQuery("西华", "transporter", start, end, 1, 10).then(function (resp) {
     total_records.value = resp.length;
     page_count = parseInt(resp.length) % 10;
@@ -223,16 +795,13 @@ const month_before =
   "-" +
   month_time.getDate();
 
-let total_records = ref(1000);
-let current_page = ref(1);
-let page_count = 0;
-const data = ref([]);
 const today =
   new Date().getFullYear() +
   "-" +
   (new Date().getMonth() + 1) +
   "-" +
   new Date().getDate();
+
 const tomorrow =
   new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() +
   "-" +
@@ -240,6 +809,7 @@ const tomorrow =
   "-" +
   new Date(time + 1 * 24 * 60 * 60 * 1000).getDate();
 var start = today;
+
 var end = tomorrow;
 const total = ref(2);
 const yAxis = ref([]);
@@ -256,7 +826,7 @@ const config_alert = reactive({
   xAxis: {
     name: "日期",
     data: ["垃圾预测量", today + " 今日目前垃圾量"],
-    interval:100
+    interval: 100,
   },
   yAxis: {
     name: "垃圾净重",
@@ -278,6 +848,7 @@ const config_alert = reactive({
 
 // =============================================================================sunny
 // 过去一周各时段垃圾净重平均值统计
+
 const avgTime_Line = reactive({
   title: {
     text: "各时段垃圾平均净重",
@@ -511,14 +1082,10 @@ onBeforeMount(() => {
               (month_total.value / 1000 / 6).toFixed(0) * 1;
             var alert_status = Math.abs(yAxis_alert.value[0] - yAxis.value[6]);
 
-            if (
-              alert_status <= Number((yAxis_alert.value[0] * 0.2))
-            ) {
+            if (alert_status <= Number(yAxis_alert.value[0] * 0.2)) {
               alert_tag.value.type = "success";
               alert_tag.value.name = "正常";
-            } else if (
-              alert_status > Number((yAxis_alert.value[0] * 0.2))
-            ) {
+            } else if (alert_status > Number(yAxis_alert.value[0] * 0.2)) {
               var alert_status_signed = yAxis_alert.value[0] - yAxis.value[6];
               console.log(alert_status_signed);
               if (alert_status_signed > 0) {
@@ -951,5 +1518,3 @@ const handleEdit = (index, row) => {
 
 // ===========================================================================================================
 </script>
-
-
