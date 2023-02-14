@@ -16,12 +16,12 @@
         <div class="card person-basic-info">
           <div class="card-header">
             车辆信息
-            <!-- <div class="float-end">
-              <el-button type="info" @click="patrolLocation()"
+            <div class="float-end">
+              <!-- <el-button type="info" @click="patrolLocation()"
                 >跳转定位</el-button
-              >
+              > -->
               <el-button type="info" @click="selectDate()">轨迹查询</el-button>
-            </div> -->
+            </div>
           </div>
           <div class="card-body info-box" style="width: 60%; margin-top: 8vh;margin-bottom: 7vh;">
             <el-form
@@ -87,7 +87,7 @@ import { getCars } from "@/api/content";
 import { getCarGps } from "@/api/content";
 import { getCarsLocation } from "@/api/home";
 import { ElMessage, ElDialog, tabBarProps } from "element-plus";
-import { useRoute } from "vue-router";
+import { useRoute,useRouter } from "vue-router";
 import moment from "moment";
 const carValue = ref("川ABS126");
 const carData = ref([]);
@@ -95,6 +95,7 @@ const carList = ref([]);
 const carListTianfu = ref([]);
 const carListRenhe = ref([]);
 const route = useRoute();
+const router = useRouter();
 
 var renhe_car = new Map();
 var tianfu_car = new Map();
@@ -181,6 +182,12 @@ cardetail_today=moment()
   }
 };
 
+
+const selectDate = () => {
+  var carNumber = detail_info.carNumber;
+  router.push({ name: "carRecord", query: { carNumber: carNumber } });
+  console.log(carNumber);
+};
 getPersonInfo();
 </script>
 <style scoped>

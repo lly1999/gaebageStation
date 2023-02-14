@@ -231,6 +231,20 @@ var current_car_tianfu = {
     iconAnchor: [9, 26],
   },
 };
+var current_car_renhe = {
+  carVisible: true,
+  location: state.center,
+  company: "仁和星牛",
+  current_path: [
+    [104.001068, 30.749755],
+    [104.001173, 30.749773],
+  ],
+  icon: {
+    iconUrl: require("@/assets/truck.png"),
+    iconSize: [35, 35],
+    iconAnchor: [9, 26],
+  },
+};
 
 onBeforeMount(() => {
   getCars().then((data) => {
@@ -255,32 +269,6 @@ onBeforeMount(() => {
         //console.log(carListTianfu.value)
       }
     }
-
-    // for (var i = 0; i < carData.value.length; i++) {
-    //   if (carData.value[i].company == "仁和星牛") {
-    //     getCarGps(carData.value[i].carNumber, time_before_one_minutes, current_time).then(data => {
-    //       if (data != "error: 车牌号不存在或查询操作太频繁")
-    //       //console.log(data)
-    //       {
-    //         var car = {
-    //           carVisible: false,
-    //           carNumber: data[0].carNumber,
-    //           location: [(data[0].longitude) * 1, (data[0].latitude) * 1],
-    //           company: "仁和星牛",
-    //           icon: {
-    //             iconUrl: require("@/assets/truck.png"),
-    //             iconSize: [35, 35],
-    //             iconAnchor: [9, 26],
-
-    //           }, path: []
-    //         }
-
-    //         carList.value.push(car)
-    //       }
-    //     })
-    //   }
-
-    // }
   });
 });
 onMounted(() => {
@@ -296,11 +284,12 @@ function showCars() {
     for (var i = 0; i < data.length; i++) {
       if (data[i].carNumber == carValue.value) {
         current_car.company = data[i].company;
-        if (current_car.company == "天府环境") {
+        console.log("公司"+data[i].company)
+        if (data[i].company == "天府环境") {
           current_car.icon = current_car_tianfu.icon;
         }
-        if (current_car.company == "天府环境") {
-          current_car.icon = current_car.icon;
+        if (data[i].company == "仁和星牛") {
+          current_car.icon = current_car_renhe.icon;
         }
       }
     }
