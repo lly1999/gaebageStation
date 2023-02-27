@@ -6,7 +6,7 @@
       </h5>
     </el-header>
     <el-main>
-            <div class="site_name-header">
+     <div class="site_name-header">
         <h5 class="card-title" style="font-size: 25px; padding: 5px">
           垃圾量统计(日/周/月)
         </h5>
@@ -33,31 +33,96 @@
             format="[Week] ww"
             placeholder="请选择某一周"
             size="large"
+            @change="search_site_name"
           />
           <el-date-picker
             v-if="site_name_select_way == 'month'"
             v-model="site_name_select_value"
-            type="month"
-            placeholder="请选择某个月"
+            type="monthrange"
+            start-placeholder="选择开始时间"
+            end-placeholder="选择结束时间"
             size="large"
+           
+            
+            @change="search_site_name"
           />
 
           <el-date-picker
             v-if="site_name_select_way == 'day'"
             v-model="site_name_select_value"
-            type="date"
+            type="daterange"
             placeholder="请选择日期"
+            range-separator="到"
+            start-placeholder="选择开始时间"
+            end-placeholder="选择结束时间"
             size="large"
+            @change="search_site_name"
           />
-
           <el-button
-            v-if="site_name_select_way != ''"
             type="primary"
-            :icon="Search"
-            @click="search_site_name"
             size="large"
-            >搜索
-          </el-button>
+            style="margin-left:10px"
+            @click="dialogFormVisible = true"
+            >打印报表</el-button
+          >
+          <el-dialog v-model="dialogFormVisible" title="打印报表" >
+            <el-form :model="form" >
+
+              <el-select
+                v-model="junk_form_select_way"
+                class="m-2"
+                placeholder="选择打印类型"
+                clearable
+                size="large"
+              >
+                <el-option
+                  v-for="item in junk_form_option"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+
+              <el-date-picker
+                v-if="junk_form_select_way == 'week'"
+                v-model="junk_form_select_value"
+                type="week"
+                format="[Week] ww"
+                placeholder="请选择某一周"
+                size="large"
+                @change="junk_form_time"
+              />
+              <el-date-picker
+                v-if="junk_form_select_way == 'month'"
+                v-model="junk_form_select_value"
+                type="month"
+                placeholder="请选择某个月"
+                size="large"
+                @change="junk_form_time"
+              />
+
+              <el-date-picker
+                v-if="junk_form_select_way == 'day'"
+                v-model="junk_form_select_value"
+                type="daterange"
+                placeholder="请选择日期"
+                range-separator="到"
+                start-placeholder="选择开始时间"
+                end-placeholder="选择结束时间"
+                size="large"
+                @change="junk_form_time"
+              />
+              <!-- </el-form-item> -->
+            </el-form>
+            <template #footer>
+              <span class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取消</el-button>
+                <el-button type="primary" @click="junk_exportExcel" >
+                  打印
+                </el-button>
+              </span>
+            </template>
+          </el-dialog>
           <dv-charts
             :option="site_name_total"
             style="width: 95%; height: 40vh; margin: auto"
@@ -182,20 +247,36 @@
           />
         </div>
       </div>
-            <div class="car-transport-header" style="margin-top: 8vh">
+      <div class="car-transport-header" style="margin-top: 8vh">
         <h5 class="card-title" style="font-size: 25px; padding: 5px">
-          运输垃圾的车辆列表
+          车辆运输量统计
         </h5>
         <div class="car-transport-header-search">
-          <el-input
-            style="width: 18%"
-            class="select-text-box"
+          <el-select
             v-model="queryCarNum"
-            placeholder="请输入车牌号"
-            clearable
+            placeholder="选择车牌信息"
+            style="font-size: 25px"
             size="large"
           >
-          </el-input>
+            <el-option-group>
+              <el-option
+                v-for="car in carListRenhe"
+                :key="car.carNumber"
+                :label="car.carNumber"
+                :value="car.carNumber"
+              >
+                              <span
+                  style="
+                    float: right;
+                    color: var(--el-text-color-secondary);
+                    font-size: 13px;
+                  "
+                  >{{ car.sitename }}</span
+                >
+                <span>{{ car.carNumber }}</span>
+              </el-option>
+            </el-option-group>
+          </el-select>
           <el-select
             v-model="car_transport_select_way"
             class="m-2"
@@ -222,8 +303,10 @@
           <el-date-picker
             v-if="car_transport_select_way == 'month'"
             v-model="car_transport_select_value"
-            type="month"
-            placeholder="请选择某个月"
+            type="monthrange"
+            range-separator="到"
+            start-placeholder="选择开始时间"
+            end-placeholder="选择结束时间"
             size="large"
             @change="search_car_transport"
           />
@@ -231,13 +314,15 @@
           <el-date-picker
             v-if="car_transport_select_way == 'day'"
             v-model="car_transport_select_value"
-            type="date"
-            placeholder="请选择日期"
+            type="daterange"
+            range-separator="到"
+            start-placeholder="选择开始时间"
+            end-placeholder="选择结束时间"
             size="large"
             @change="search_car_transport"
           />
-          <el-button type="primary" size="large" @click="exportExcels"
-            >导出</el-button
+          <el-button type="primary" size="large" @click="car_exportExcel" style="margin-left:10px"
+            >打印报表</el-button
           >
         </div>
 
@@ -298,6 +383,7 @@ import {
 import axios from "axios";
 import MapContent from "@/components/Mapcontent.vue";
 import { getPage, getQuery } from "@/api/content.js";
+import { getCars } from "@/api/content";
 // ==========================================================================================================sunny
 // 导入echarts
 import * as echarts from "echarts";
@@ -323,7 +409,47 @@ let car_transport_select_way = ref("");
 let car_transport_select_value = ref("");
 let site_name_select_way = ref("");
 let site_name_select_value = ref("");
+//==============================================================
+let junk_form_select_way = ref("");
+let junk_form_select_value = ref("");
+// 报表信息
+// var form_disabled = ref(true);
+const dialogFormVisible = ref(false);
 
+// ==========================================================
+const carData = ref([]);
+const carList = ref([]);
+const carListTianfu = ref([]);
+const carListRenhe = ref([]);
+// 车牌号列表
+const getAllSiteCar = (site_name) => {
+  axios({
+    url: "/api/car-by-site/" + site_name,
+    method: "get",
+  }).then(function (resp) {
+    if (resp.status == 200) {
+      var data = resp.data.data;
+      carData.value = data;
+      var car = {
+        carNumber: "全部",
+        sitename: "红星",
+      };
+      carListRenhe.value.push(car);
+      for (var i = 0; i < carData.value.length; i++) {
+        if (carData.value[i].siteName == "红星") {
+          var car = {
+            carNumber: carData.value[i].carNumber,
+            sitename: carData.value[i].siteName,
+          };
+          carListRenhe.value.push(car);
+        }
+      }
+      console.log("数据长度：" + data.length);
+    }
+  });
+};
+getAllSiteCar("all");
+//=============================================================
 const car_transport_option = [
   {
     value: "day",
@@ -352,10 +478,24 @@ const site_name_option = [
     label: "按月查询",
   },
 ];
-
+const junk_form_option = [
+  {
+    value: "day",
+    label: "日报表",
+  },
+  {
+    value: "week",
+    label: "周报表",
+  },
+  {
+    value: "month",
+    label: "月报表",
+  },
+];
 var json_data = ref();
 var start = ref("");
 var end = ref("");
+
 const transport_today =
   new Date().getFullYear() +
   "-" +
@@ -363,11 +503,16 @@ const transport_today =
   "-" +
   new Date().getDate();
 var transport_start = transport_today;
+start = transport_today;
+end = transport_today;
 console.log("transport_start" + transport_start);
 const search_car_transport = () => {
   var carNumber = "all";
   if (queryCarNum.value.trim() != "") {
     carNumber = queryCarNum.value.trim();
+  }
+      if (queryCarNum.value == "全部") {
+    carNumber = "all";
   }
 
   console.log("查到的值：" + carNumber);
@@ -383,7 +528,8 @@ const search_car_transport = () => {
     start = start_day;
     var month = d.getMonth() + 1;
     if (car_transport_select_way.value == "day") {
-      end = start_day;
+      start = moment(car_transport_select_value.value[0]).format("YYYY-MM-DD");
+      end = moment(car_transport_select_value.value[1]).format("YYYY-MM-DD");
     }
     if (car_transport_select_way.value == "week") {
       const endTime = new Date(
@@ -396,8 +542,8 @@ const search_car_transport = () => {
       end = moment(endTime).format("YYYY-MM-DD");
     }
     if (car_transport_select_way.value == "month") {
-      const end_month = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-      end = moment(end_month).format("YYYY-MM-DD");
+      start = moment(car_transport_select_value.value[0]).startOf("month").format("YYYY-MM-DD")
+      end=moment(car_transport_select_value.value[1]).endOf("month").format("YYYY-MM-DD")
     }
 
     getTransportList(start, end, "红星", 1, 10000, carNumber);
@@ -439,8 +585,8 @@ const getTransportList = (
             day: start + " 至 " + end,
             siteName: data[car].siteName,
             carNumber: data[car].carNumber,
-            avgWeight: data[car].avgWeight,
             frequency: data[car].frequency,
+            avgWeight: data[car].avgWeight,
             totalWeight: data[car].totalWeight,
           };
           data_total.push(currentCar);
@@ -453,8 +599,8 @@ const getTransportList = (
               day: start + " 至 " + end,
               siteName: data[car].siteName,
               carNumber: data[car].carNumber,
-              avgWeight: data[car].avgWeight,
-              frequency: data[car].frequency,
+            frequency: data[car].frequency,
+            avgWeight: data[car].avgWeight,
               totalWeight: data[car].totalWeight,
             };
             data_total.push(currentCar);
@@ -464,8 +610,8 @@ const getTransportList = (
         }
       }
       console.log("数据长度：" + data.length);
-      totalRecords.value = data.length;
-      pageCount = parseInt(data.length) % 10;
+      totalRecords.value = data_total.length;
+      pageCount = parseInt(data_total.length) % 10;
       currentPage.value = pageNum;
     }
   });
@@ -478,18 +624,19 @@ const getTransport = (pageNum) => {
   currentPage.value = pageNum;
 };
 
-const exportExcels = () => {
+const car_exportExcel = () => {
   const titleArr = [
     "时间",
     "站点名称",
     "车牌号",
     "运输次数",
-    "运输总量/kg",
     "单次平均运输量/kg",
+    "运输总量/kg",
   ]; //表头中文名
+
   exportExcel(
     json_data.value,
-    "红星站运输垃圾的车辆列表 ",
+    "红星站" + start + "至" + end + "车辆运输量统计",
     titleArr,
     "sheetName"
   );
@@ -538,14 +685,14 @@ function exportExcel(json, name, titleArr, sheetName) {
 }
 
 // =============================================================================sunny
-const site_name_yAxis = ref([0, 0, 0, 0, 0]);
-const site_name_date = ref(["0", 0, 0, 0, 0]);
+const site_name_yAxis = ref([]);
+const site_name_date = ref([]);
 var today_time = moment().format("YYYY-MM-DD");
-site_name_date.value[0] = moment().add(-2, "d").format("YYYY-MM-DD");
-site_name_date.value[1] = moment().add(-1, "d").format("YYYY-MM-DD");
-site_name_date.value[2] = today_time;
-site_name_date.value[3] = moment().add(+1, "d").format("YYYY-MM-DD");
-site_name_date.value[4] = moment().add(+2, "d").format("YYYY-MM-DD");
+site_name_date.value[0] = moment().add(-4, "d").format("YYYY-MM-DD");
+site_name_date.value[1] = moment().add(-3, "d").format("YYYY-MM-DD");
+site_name_date.value[2] = moment().add(-2, "d").format("YYYY-MM-DD");
+site_name_date.value[3] = moment().add(-1, "d").format("YYYY-MM-DD");
+site_name_date.value[4] = today_time;
 
 const site_name_sum = ref(0);
 // 过去一周各时段垃圾净重平均值统计
@@ -578,6 +725,9 @@ const site_name_total = reactive({
 // =====================================================================================
 // 站点天，周，月，季度统计
 const search_site_name = () => {
+  ElMessage("固定展示五个日/周/月，其余可导出报表查看详细信息！");
+  site_name_date.value = [];
+
   var start;
   var end;
   if (site_name_select_value.value == "") {
@@ -591,32 +741,27 @@ const search_site_name = () => {
       d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
 
     if (site_name_select_way.value == "day") {
-      site_name_date.value[0] = moment(start_day)
-        .add(-2, "d")
-        .format("YYYY-MM-DD");
-      site_name_date.value[1] = moment(start_day)
-        .add(-1, "d")
-        .format("YYYY-MM-DD");
-      site_name_date.value[2] = start_day;
-      site_name_date.value[3] = moment(start_day)
-        .add(+1, "d")
-        .format("YYYY-MM-DD");
-      site_name_date.value[4] = moment(start_day)
-        .add(+2, "d")
-        .format("YYYY-MM-DD");
-      for (var date = 0; date < 5; date++) {
+      start = moment(site_name_select_value.value[0]).format("YYYY-MM-DD");
+      end = moment(site_name_select_value.value[1]).format("YYYY-MM-DD");
+
+      for (var i = 0; i <= 4; i++) {
+        site_name_date.value[i] = moment(site_name_select_value.value[0])
+          .add(i, "d")
+          .format("YYYY-MM-DD");
+        console.log(site_name_date.value[i]);
         getSiteNameList(
-          site_name_date.value[date],
-          site_name_date.value[date],
+          site_name_date.value[i],
+          site_name_date.value[i],
           "红星",
           1,
           10000,
-          date
+          i
         );
       }
-      site_name_date.value[2] = "当天：" + site_name_date.value[2];
     }
+
     if (site_name_select_way.value == "week") {
+      //统计五周的数据
       site_name_date.value[0] = moment(start_day).day(-14).format("YYYY-MM-DD");
       site_name_date.value[1] = moment(start_day).day(-7).format("YYYY-MM-DD");
       site_name_date.value[2] = moment(start_day).day(0).format("YYYY-MM-DD");
@@ -630,45 +775,31 @@ const search_site_name = () => {
       }
       site_name_date.value[2] = "当周：" + site_name_date.value[2];
     }
+
     if (site_name_select_way.value == "month") {
-      site_name_date.value[0] = moment(start_day)
-        .month(moment(start_day).month() - 2)
-        .startOf("month")
-        .format("YYYY-MM-DD");
-      site_name_date.value[1] = moment(start_day)
-        .month(moment(start_day).month() - 1)
-        .startOf("month")
-        .format("YYYY-MM-DD");
-      site_name_date.value[2] = moment(start_day)
-        .startOf("month")
-        .format("YYYY-MM-DD");
-      site_name_date.value[3] = moment(start_day)
-        .month(moment(start_day).month() + 1)
-        .startOf("month")
-        .format("YYYY-MM-DD");
-      site_name_date.value[4] = moment(start_day)
-        .month(moment(start_day).month() + 2)
-        .startOf("month")
-        .format("YYYY-MM-DD");
-      for (var date = 0; date < 5; date++) {
-        start = site_name_date.value[date];
-        end = moment(site_name_date.value[date])
-          .endOf("month")
+      //起始月份
+      start = moment(site_name_select_value.value[0]).format("YYYY-MM-DD");
+ 
+      for (var date = 0; date <= 4; date++) {
+        start = moment(site_name_select_value.value[0])
+          .add(date, "months")
           .format("YYYY-MM-DD");
+
+        end = moment(start).endOf("month").format("YYYY-MM-DD");
+        //统计一个月的总量
         getSiteNameList(start, end, "红星", 1, 10000, date);
-        site_name_date.value[date] = moment(site_name_date.value[date])
+        //图标x轴标签展示月份
+        site_name_date.value[date] = moment(start)
           .startOf("month")
           .format("YYYY-MM");
       }
-      site_name_date.value[2] = "当月：" + site_name_date.value[2];
     }
-    // console.log("查询到的日期：" + start_day);
 
-    // getSiteNameList(start, end, "红星", 1, 10000);
     site_name_select_way.value = "";
   }
 };
-
+const junk_data = reactive([]);
+var junk_json = ref();
 const getSiteNameList = (start, end, site_name, pageNum, pageSize, date) => {
   axios({
     url:
@@ -694,14 +825,13 @@ const getSiteNameList = (start, end, site_name, pageNum, pageSize, date) => {
 
       site_name_sum.value =
         Math.floor((site_name_sum.value / 1000) * 100) / 100;
-      console.log("总量：" + Number(site_name_sum.value.toFixed(0)));
 
       site_name_yAxis.value[date] = Number(site_name_sum.value.toFixed(0));
     }
   });
 };
 const recent_days_total = (site_name_date) => {
-  for (var date = 0; date < 5; date++) {
+  for (var date = 0; date < 7; date++) {
     getSiteNameList(
       site_name_date.value[date],
       site_name_date.value[date],
@@ -713,6 +843,111 @@ const recent_days_total = (site_name_date) => {
   }
 };
 recent_days_total(site_name_date);
+
+
+async function junk_form_time() {
+  if (junk_form_select_value.value == "") {
+    ElMessage({
+      message: "请选择相应日期",
+      type: "error",
+    });
+  } else {
+    start = moment(junk_form_select_value.value[0]).format("YYYY-MM-DD");
+    if (junk_form_select_way.value == "day") {
+      end = moment(junk_form_select_value.value[1]).format("YYYY-MM-DD");
+    }
+    if (junk_form_select_way.value == "week") {
+      const endTime = new Date(
+        new Date(junk_form_select_value.value).getTime() +
+          3600 *
+            1000 *
+            24 *
+            (6 - new Date(junk_form_select_value.value).getDay())
+      );
+      start = moment(junk_form_select_value.value).format("YYYY-MM-DD");
+      end = moment(endTime).format("YYYY-MM-DD");
+    }
+    if (junk_form_select_way.value == "month") {
+      start = moment(junk_form_select_value.value)
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      end = moment(junk_form_select_value.value)
+        .endOf("month")
+        .format("YYYY-MM-DD");
+    }
+    console.log(start);
+    console.log(end);
+    //起始时间和终止时间相差的天数
+    let days = moment(end).diff(moment(start), "day");
+    console.log("相差天数：" + days);
+    junk_json.value = [];
+    junk_data.splice(0, junk_data.length);
+    for (let i = 0; i <= days; i++) {
+      (function (i) {
+        setTimeout(function () {
+          getJunkForm(
+            moment(start).add(i, "d").format("YYYY-MM-DD"),
+            moment(start).add(i, "d").format("YYYY-MM-DD"),
+            "红星",
+            1,
+            10000
+          );
+        }, (i + 1) * 30);
+      })(i);
+    }
+    junk_json.value = junk_data;
+    site_name_select_way.value = "";
+
+  }
+}
+
+const getJunkForm = (start, end, site_name, pageNum, pageSize) => {
+  axios({
+    url:
+      "/api/dump-record/dump_car/" +
+      start +
+      "/" +
+      end +
+      "/" +
+      site_name +
+      "/" +
+      pageNum +
+      "/" +
+      pageSize,
+
+    method: "get",
+  }).then(function (resp) {
+    if (resp.status == 200) {
+      var data = resp.data.data.records;
+      site_name_sum.value = 0;
+      for (let i = 0; i < data.length; i++) {
+        site_name_sum.value = data[i].totalWeight + site_name_sum.value;
+      }
+
+      site_name_sum.value =
+        Math.floor((site_name_sum.value / 1000) * 100) / 100;
+
+      var total = site_name_sum.value;
+      console.log("总量：" + total);
+      var current = {
+        time: start,
+        day: total,
+      };
+      junk_data.push(current);
+    }
+  });
+};
+
+// 导出垃圾报表
+const junk_exportExcel = () => {
+  const titleArr = ["时间", "垃圾总量/kg"]; //表头中文名
+  exportExcel(
+    junk_json.value,
+    "红星站" + start + "至" + end + "垃圾总量统计",
+    titleArr,
+    "sheetName"
+  );
+};
 
 //===============================================================================================================
 //===============================================================================================================
@@ -809,7 +1044,7 @@ const tomorrow =
   "-" +
   new Date(time + 1 * 24 * 60 * 60 * 1000).getDate();
 var start = today;
-var end = tomorrow;
+// var end = tomorrow;
 const total = ref(2);
 const yAxis = ref([0, 0, 0, 0, 0, 0]);
 const month_total = ref(0);
@@ -1171,7 +1406,7 @@ const pull_page = (page) => {
   //     delete patrolInfo[key]
   // });
   current_page.value = page;
-  getQuery("红星", "transporter", start, end, page, 10).then(function (resp) {
+  getQuery("红星", "transporter", start, moment(start).add(1,"day").format("YYYY-MM-DD"), page, 10).then(function (resp) {
     data.value = resp;
     ifShowQueryResult.value = false;
   });
