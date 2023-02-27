@@ -46,7 +46,7 @@
                   float: right;
                   color: var(--el-text-color-secondary);
                   font-size: 13px;
-                  padding: 5px;
+                  
                 "
                 >{{ car.company }}</span
               >
@@ -279,7 +279,7 @@ onMounted(() => {
   }
 });
 function showCars() {
-  console.log(carValue.value);
+  console.log("车辆："+carValue.value);
   getCars().then((data) => {
     for (var i = 0; i < data.length; i++) {
       if (data[i].carNumber == carValue.value) {

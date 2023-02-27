@@ -171,7 +171,6 @@ const getPersonInfo = () => {
       }
     })
 cardetail_today=moment()
-        .add(-5, "d")
         .format("YYYY-MM-DD");
         console.log("这个月前一天"+cardetail_today)
     getCarGps(carNumber, cardetail_today, tomorrow).then((resp) => {
