@@ -63,6 +63,7 @@
             @click="dialogFormVisible = true"
             >打印报表</el-button
           >
+          
           <el-dialog v-model="dialogFormVisible" title="打印报表">
             <el-form :model="form">
               <el-select
@@ -261,6 +262,7 @@
             size="large"
             @change="search_car_transport"
           />
+          
 
           <el-date-picker
             v-if="car_transport_select_way == 'day'"
@@ -317,6 +319,7 @@
           @current-change="getTransport"
         />
       </div>
+
     </el-main>
   </el-container>
 </template>
@@ -347,6 +350,7 @@ import { useStore } from "vuex";
 import * as XLSX from "xlsx";
 import { ElMessage } from "element-plus";
 import moment from "moment";
+import { DateWeekRange } from 'date-week-range'
 
 const store = useStore();
 // let total_records = ref(1000);
@@ -542,7 +546,7 @@ const search_car_transport = () => {
     }
 
     getTransportList(start, end, "all", 1, 10000, carNumber);
-    car_transport_select_way.value = "";
+    // car_transport_select_way.value = "";
   }
 };
 const data_total = reactive([]);
@@ -790,7 +794,7 @@ const search_site_name = () => {
       }
     }
 
-    site_name_select_way.value = "";
+    // site_name_select_way.value = "";
   }
 };
 
@@ -891,7 +895,7 @@ async function junk_form_time() {
       })(i);
     }
     junk_json.value = junk_data;
-    site_name_select_way.value = "";
+    // site_name_select_way.value = "";
   }
 }
 
