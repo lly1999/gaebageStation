@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import DateWeekRange from 'date-week-range'
 import router from './router'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
@@ -33,6 +34,7 @@ createApp(App)
     .use(ElementPlus, {
           locale: zhCn,
     })
+    .use(DateWeekRange)
     .use(VueAMap)
     .use(DataVVue3)
     .use(VueTianditu, {
