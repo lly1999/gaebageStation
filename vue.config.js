@@ -15,5 +15,6 @@ module.exports = defineConfig({
         }
       }
     }
-  }
+  },
+      transpileDependencies: ['date-week-range', 'element-plus']
 })

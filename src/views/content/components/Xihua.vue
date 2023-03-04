@@ -10,6 +10,7 @@
         <h5 class="card-title" style="font-size: 25px; padding: 5px">
           垃圾量统计(日/周/月)
         </h5>
+
         <div class="site_name-header-search">
           <el-select
             v-model="site_name_select_way"
@@ -29,17 +30,20 @@
           <el-date-picker
             v-if="site_name_select_way == 'week'"
             v-model="site_name_select_value"
-            type="week"
-            format="[Week] ww"
-            placeholder="请选择某一周"
+            type="daterange"
+            start-placeholder="选择开始时间"
+            range-separator="到"
+            end-placeholder="选择结束时间"
             size="large"
             @change="search_site_name"
           />
+
           <el-date-picker
             v-if="site_name_select_way == 'month'"
             v-model="site_name_select_value"
             type="monthrange"
             start-placeholder="选择开始时间"
+            range-separator="到"
             end-placeholder="选择结束时间"
             size="large"
             @change="search_site_name"
@@ -179,6 +183,20 @@
         <h5 class="card-title" style="font-size: 25px; padding: 5px">
           垃圾记录
         </h5>
+        <el-select
+          v-model="site_name_select_way"
+          class="m-2"
+          placeholder="选择查询方式"
+          clearable
+          size="large"
+        >
+          <el-option
+            v-for="item in site_name_option"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
         <el-date-picker
           v-model="value"
           type="daterange"
@@ -291,7 +309,6 @@
             v-if="car_transport_select_way == 'week'"
             v-model="car_transport_select_value"
             type="week"
-            format="[Week] ww"
             placeholder="请选择某一周"
             size="large"
             @change="search_car_transport"
@@ -390,6 +407,7 @@ import {
   getAllGp,
   getTransportCars,
 } from "@/api/content.js";
+import { DateWeekRange } from "date-week-range";
 
 // ==========================================================================================================sunny
 // 导入echarts
@@ -741,10 +759,13 @@ const site_name_total = reactive({
   ],
 });
 
+
 // =====================================================================================
 // 站点天，周，月，季度统计
 const search_site_name = () => {
-  ElMessage("固定展示五个日/周/月，其余可导出报表查看详细信息！");
+
+    ElMessage("固定展示五个日/周/月，其余可导出报表查看详细信息！");
+ 
   site_name_date.value = [];
 
   var start;
@@ -778,21 +799,43 @@ const search_site_name = () => {
         );
       }
     }
-
+    //最老版本
+    // if (site_name_select_way.value == "week") {
+    //   //统计五周的数据
+    //   site_name_date.value[0] = moment(start_day).day(-14).format("YYYY-MM-DD");
+    //   site_name_date.value[1] = moment(start_day).day(-7).format("YYYY-MM-DD");
+    //   site_name_date.value[2] = moment(start_day).day(0).format("YYYY-MM-DD");
+    //   site_name_date.value[3] = moment(start_day).day(7).format("YYYY-MM-DD");
+    //   site_name_date.value[4] = moment(start_day).day(14).format("YYYY-MM-DD");
+    //   for (var date = 0; date < 5; date++) {
+    //     start = site_name_date.value[date];
+    //     end = moment(site_name_date.value[date]).day(6).format("YYYY-MM-DD");
+    //     getSiteNameList(start, end, "西华", 1, 10000, date);
+    //     site_name_date.value[date] = start + " 至 " + end;
+    //   }
+    //   site_name_date.value[2] = "当周：" + site_name_date.value[2];
+    // }
     if (site_name_select_way.value == "week") {
-      //统计五周的数据
-      site_name_date.value[0] = moment(start_day).day(-14).format("YYYY-MM-DD");
-      site_name_date.value[1] = moment(start_day).day(-7).format("YYYY-MM-DD");
-      site_name_date.value[2] = moment(start_day).day(0).format("YYYY-MM-DD");
-      site_name_date.value[3] = moment(start_day).day(7).format("YYYY-MM-DD");
-      site_name_date.value[4] = moment(start_day).day(14).format("YYYY-MM-DD");
-      for (var date = 0; date < 5; date++) {
-        start = site_name_date.value[date];
-        end = moment(site_name_date.value[date]).day(6).format("YYYY-MM-DD");
-        getSiteNameList(start, end, "西华", 1, 10000, date);
-        site_name_date.value[date] = start + " 至 " + end;
+      start = moment(site_name_select_value.value[0]).format("YYYY-MM-DD");
+      end = moment(site_name_select_value.value[1]).format("YYYY-MM-DD");
+
+      for (var i = 0; i <= 4; i++) {
+        site_name_date.value[i] = moment(start)
+          .add(i, "d")
+          .format("YYYY-MM-DD");
+        // console.log(site_name_date.value[i]);
+        getSiteNameList(
+          site_name_date.value[i],
+          site_name_date.value[i],
+          "西华",
+          1,
+          10000,
+          i
+        );
+        site_name_date.value[i] =
+          start + " 至 " + moment(start).add(6, "d").format("YYYY-MM-DD");
+        start = moment(start).add(7, "day").format("YYYY-MM-DD");
       }
-      site_name_date.value[2] = "当周：" + site_name_date.value[2];
     }
 
     if (site_name_select_way.value == "month") {
@@ -1771,6 +1814,7 @@ const handleEdit = (index, row) => {
 // ===========================================================================================================
 </script>
 <style scoped>
+@import "date-picker-week-range/style.css";
 .xiaoxin {
   margin-top: 10px;
 }

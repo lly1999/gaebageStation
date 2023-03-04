@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import DateWeekRange from 'date-week-range'
 import router from './router'
+
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import VueAMap, { initAMapApiLoader } from '@vuemap/vue-amap';
@@ -24,7 +24,8 @@ import * as echarts from 'echarts';
 //app.config.globalProperties.$echarts = echarts;
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import 'dayjs/locale/zh-cn';
-
+import weekRange from 'date-picker-week-range'
+import DateWeekRange from 'date-week-range'
 
 
 
@@ -34,6 +35,7 @@ createApp(App)
     .use(ElementPlus, {
           locale: zhCn,
     })
+    .use(weekRange)
     .use(DateWeekRange)
     .use(VueAMap)
     .use(DataVVue3)

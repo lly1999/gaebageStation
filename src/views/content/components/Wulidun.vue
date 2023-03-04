@@ -29,9 +29,10 @@
           <el-date-picker
             v-if="site_name_select_way == 'week'"
             v-model="site_name_select_value"
-            type="week"
-            format="[Week] ww"
-            placeholder="请选择某一周"
+            type="daterange"
+            start-placeholder="选择开始时间"
+            range-separator="到"
+            end-placeholder="选择结束时间"
             size="large"
             @change="search_site_name"
           />
@@ -756,19 +757,26 @@ const search_site_name = () => {
     }
 
     if (site_name_select_way.value == "week") {
-      //统计五周的数据
-      site_name_date.value[0] = moment(start_day).day(-14).format("YYYY-MM-DD");
-      site_name_date.value[1] = moment(start_day).day(-7).format("YYYY-MM-DD");
-      site_name_date.value[2] = moment(start_day).day(0).format("YYYY-MM-DD");
-      site_name_date.value[3] = moment(start_day).day(7).format("YYYY-MM-DD");
-      site_name_date.value[4] = moment(start_day).day(14).format("YYYY-MM-DD");
-      for (var date = 0; date < 5; date++) {
-        start = site_name_date.value[date];
-        end = moment(site_name_date.value[date]).day(6).format("YYYY-MM-DD");
-        getSiteNameList(start, end, "五里墩", 1, 10000, date);
-        site_name_date.value[date] = start + " 至 " + end;
+      start = moment(site_name_select_value.value[0]).format("YYYY-MM-DD");
+      end = moment(site_name_select_value.value[1]).format("YYYY-MM-DD");
+
+      for (var i = 0; i <= 4; i++) {
+        site_name_date.value[i] = moment(start)
+          .add(i, "d")
+          .format("YYYY-MM-DD");
+        // console.log(site_name_date.value[i]);
+        getSiteNameList(
+          site_name_date.value[i],
+          site_name_date.value[i],
+          "西华",
+          1,
+          10000,
+          i
+        );
+        site_name_date.value[i] =
+          start + " 至 " + moment(start).add(6, "d").format("YYYY-MM-DD");
+        start = moment(start).add(7, "day").format("YYYY-MM-DD");
       }
-      site_name_date.value[2] = "当周：" + site_name_date.value[2];
     }
 
     if (site_name_select_way.value == "month") {
