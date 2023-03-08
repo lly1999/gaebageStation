@@ -23,6 +23,7 @@
           start-placeholder="选择开始时间"
           end-placeholder="选择结束时间"
           :shortcuts="shortcuts"
+          :disabled-date="disabledDate"
           @change="changeDate"
           size="large"
         />
@@ -113,6 +114,11 @@ const carList = ref([]);
 const carListTianfu = ref([]);
 const carListRenhe = ref([]);
 const route = useRoute();
+
+// 禁选今天以后的日期以及没有数据的
+const disabledDate = (time) => {
+        return time.getTime() < new Date("2022-8-31").getTime() || time.getTime() > new Date("2023-3-8").getTime()
+}
 
 const car = ref({});
 const today =

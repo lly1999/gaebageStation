@@ -23,7 +23,10 @@
               <el-button type="info" @click="selectDate()">轨迹查询</el-button>
             </div>
           </div>
-          <div class="card-body info-box" style="width: 60%; margin-top: 8vh;margin-bottom: 7vh;">
+          <div
+            class="card-body info-box"
+            style="width: 60%; margin-top: 8vh; margin-bottom: 7vh"
+          >
             <el-form
               :model="detail_info"
               label-position="right"
@@ -87,7 +90,7 @@ import { getCars } from "@/api/content";
 import { getCarGps } from "@/api/content";
 import { getCarsLocation } from "@/api/home";
 import { ElMessage, ElDialog, tabBarProps } from "element-plus";
-import { useRoute,useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import moment from "moment";
 const carValue = ref("川ABS126");
 const carData = ref([]);
@@ -159,9 +162,9 @@ var cardetail_today;
 const getPersonInfo = () => {
   if (route.query.carNumber) {
     var carNumber = route.query.carNumber;
-          detail_info.carNumber = carNumber;
-      detail_info.name = "待完善";
-      detail_info.telephone = "待完善";
+    detail_info.carNumber = carNumber;
+    detail_info.name = "待完善";
+    detail_info.telephone = "待完善";
 
     getCars().then(function (resp) {
       for (let i = 0; i < resp.length; i++) {
@@ -169,18 +172,14 @@ const getPersonInfo = () => {
           detail_info.company = resp[i].company;
         }
       }
-    })
-cardetail_today=moment()
-        .format("YYYY-MM-DD");
-        console.log("这个月前一天"+cardetail_today)
+    });
+    cardetail_today = moment().format("YYYY-MM-DD");
+    console.log("这个月前一天" + cardetail_today);
     getCarGps(carNumber, cardetail_today, tomorrow).then((resp) => {
-
       detail_info.lastTime = resp[resp.length - 1].exactDate;
-
     });
   }
 };
-
 
 const selectDate = () => {
   var carNumber = detail_info.carNumber;
@@ -191,55 +190,53 @@ getPersonInfo();
 </script>
 <style scoped>
 /* .container { */
-    /* margin-left: 16vw; */
+/* margin-left: 16vw; */
 /* } */
 
 .person-basic-info {
-    margin-top: 8vh;
+  margin-top: 8vh;
 }
 
 .person-basic-img {
-    margin-top: 8vh;
+  margin-top: 8vh;
 }
 
 .info-box {
-    margin-left: 7vw;
-    margin-right: 7vw;
+  margin-left: 7vw;
+  margin-right: 7vw;
 }
 
 .case-box {
-    margin-left: 7vw;
+  margin-left: 7vw;
 }
 
 .person-issue-box {
-    margin-top: 2vh;
+  margin-top: 2vh;
 }
 
 .card-header {
-    font-size: 1.5rem;
+  font-size: 1.5rem;
 }
 
-
 .case-box-body {
-    margin-top: 1vh;
-    width: 20vw;
+  margin-top: 1vh;
+  width: 20vw;
 }
 
 .img-responsive {
-    max-width: 100%;
-    height: auto;
+  max-width: 100%;
+  height: auto;
 }
 
 :deep(.el-form-item__label) {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 
 :deep(.is-disabled .el-input__inner) {
-    cursor: text;
+  cursor: text;
 }
 
 :deep(.el-input.is-disabled) {
-    cursor: text;
+  cursor: text;
 }
-
 </style>
