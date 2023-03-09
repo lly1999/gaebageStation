@@ -116,7 +116,7 @@
                 仁和星牛车辆
               </h5>
               <div class="card-body" style="padding-top: 5px">
-                <div id="renhe_pie" ></div>
+                <div id="renhe_pie"></div>
               </div>
             </dv-border-box7>
 
@@ -515,7 +515,7 @@ import Xihua from "@/views/content/components/Xihua.vue";
 import Honghuayan from "@/views/content/components/Honghuayan.vue";
 import Wukuaishi from "@/views/content/components/Wukuaishi.vue";
 import Wulidun from "@/views/content/components/Wulidun.vue";
-import CarRecord from '@/views/content/components/CarRecord.vue'
+import CarRecord from "@/views/content/components/CarRecord.vue";
 import { getCars } from "@/api/content";
 import { getCarGps, getAllGps } from "@/api/content";
 import { getCarsLocation } from "@/api/home";
@@ -627,11 +627,11 @@ function handleClose() {
 const getTianfuList = (page) => {
   // 清空数组，因为请求一次接口，后面都会将这些数据加入数组，所以每次请求一次的时候先清空数组
   tianfuList.splice(0, tianfuList.length);
-      tianfu_car.forEach((val, key) => {
-      if (val != 0) {
-        val = 0;
-      }
-    })
+  tianfu_car.forEach((val, key) => {
+    if (val != 0) {
+      val = 0;
+    }
+  });
   // renheVisible.value = false;
   getCarsLocation().then((resp) => {
     let num = 0;
@@ -639,14 +639,15 @@ const getTianfuList = (page) => {
     for (var car in resp) {
       let gps_time = Date.parse(resp[car].exactDate.replace("T", " "));
       resp[car].carNumber = trim(resp[car].carNumber);
-      
+
       if (tianfu_car.has(resp[car].carNumber.toUpperCase())) {
         zonggong++;
-        
-        
+
         if (gps_time + 4 * 60 * 60 * 1000 > time) {
-          tianfu_car.set(resp[car].carNumber.toUpperCase(), 2)
-          console.log("我在这里："+zonggong+":"+resp[car].carNumber.toUpperCase())
+          tianfu_car.set(resp[car].carNumber.toUpperCase(), 2);
+          console.log(
+            "我在这里：" + zonggong + ":" + resp[car].carNumber.toUpperCase()
+          );
           var currentCar = {
             day: resp[car].exactDate,
             carNumber: resp[car].carNumber,
@@ -661,25 +662,25 @@ const getTianfuList = (page) => {
     tianfu_car.forEach((val, key) => {
       gong++;
       if (val != 2) {
-                  var currentCar = {
-            day: "停用",
-            carNumber: key,
-            location: "停用",
+        var currentCar = {
+          day: "停用",
+          carNumber: key,
+          location: "停用",
         };
-                    tianfuList.push(currentCar);
-          num++;
+        tianfuList.push(currentCar);
+        num++;
       }
-      console.log(gong+":"+key,val)
-    })
+      console.log(gong + ":" + key, val);
+    });
     var zong = 0;
     tianfu_car.forEach((val, key) => {
       zong++;
       if (val != 0) {
         val = 0;
       }
-      console.log(zong+":"+key,val)
-    })
-    console.log("天府环境多少辆："+tianfu_car.size)
+      console.log(zong + ":" + key, val);
+    });
+    console.log("天府环境多少辆：" + tianfu_car.size);
     // pageSize.value = 10
     //总条数
     total_records.value = num;
@@ -705,9 +706,8 @@ const getRenheList = (page) => {
       let gps_time = Date.parse(resp[car].exactDate.replace("T", " "));
       resp[car].carNumber = trim(resp[car].carNumber);
       if (renhe_car.has(resp[car].carNumber.toUpperCase())) {
-        
         if (gps_time + 4 * 60 * 60 * 1000 > time) {
-          renhe_car.set(resp[car].carNumber.toUpperCase(),2)
+          renhe_car.set(resp[car].carNumber.toUpperCase(), 2);
           var currentCar = {
             day: resp[car].exactDate,
             carNumber: resp[car].carNumber,
@@ -718,22 +718,22 @@ const getRenheList = (page) => {
         }
       }
     }
-        renhe_car.forEach((val, key)=>{
+    renhe_car.forEach((val, key) => {
       if (val != 2) {
-                  var currentCar = {
-            day: "停用",
-            carNumber: key,
-            location: "停用",
+        var currentCar = {
+          day: "停用",
+          carNumber: key,
+          location: "停用",
         };
-          renheList.push(currentCar);
-          num++;
+        renheList.push(currentCar);
+        num++;
       }
-    })
+    });
     renhe_car.forEach((val, key) => {
       if (val != 0) {
         val = 0;
       }
-    })
+    });
     //总条数
     totalrecords.value = num;
     // 当前页
@@ -2740,9 +2740,9 @@ const create_category_data = () => {
   let chartDom = document.getElementById("large_pie");
   //初始化图表
   category_chart = echarts.init(chartDom);
-  category_chart.on('click', (params) => {
-    console.log("params:"+ params.data.name);
-  })
+  category_chart.on("click", (params) => {
+    console.log("params:" + params.data.name);
+  });
 
   //绘制图表
   category_chart.setOption(categoryOption);
@@ -2846,7 +2846,7 @@ let smallOption = {
       axisTick: {
         alignWithLabel: true,
       },
-      interval:0,
+      interval: 0,
       axisLabel: {
         fontSize: fontSizeSwitch(0.15),
         show: true,
@@ -3134,11 +3134,10 @@ const create_renhe_data = () => {
   //初始化图表
   renhe_chart = echarts.init(chartDom);
 
-      renhe_chart.on('click', (params) => {
-      console.log("params:" + params.data.name);
-      renheVisible.value = true
-
-  })
+  renhe_chart.on("click", (params) => {
+    console.log("params:" + params.data.name);
+    renheVisible.value = true;
+  });
 
   //绘制图表
   renhe_chart.setOption(renheOption);
@@ -3240,11 +3239,10 @@ const create_tianfu_data = () => {
   //初始化图表
   tianfu_chart = echarts.init(chartDom);
 
-    tianfu_chart.on('click', (params) => {
-      console.log("params:" + params.data.name);
-      tianfuVisible.value = true
-
-  })
+  tianfu_chart.on("click", (params) => {
+    console.log("params:" + params.data.name);
+    tianfuVisible.value = true;
+  });
 
   //绘制图表
   tianfu_chart.setOption(tianfuOption);

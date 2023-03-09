@@ -34,6 +34,7 @@
             range-separator="到"
             end-placeholder="选择结束时间"
             size="large"
+            :disabled-date="disabledDate"
             @change="search_site_name"
           />
           <el-date-picker
@@ -43,7 +44,7 @@
             start-placeholder="选择开始时间"
             end-placeholder="选择结束时间"
             size="large"
-           
+           :disabled-date="disabledDate"
             
             @change="search_site_name"
           />
@@ -57,73 +58,17 @@
             start-placeholder="选择开始时间"
             end-placeholder="选择结束时间"
             size="large"
+            :disabled-date="disabledDate"
             @change="search_site_name"
           />
           <el-button
             type="primary"
             size="large"
             style="margin-left:10px"
-            @click="dialogFormVisible = true"
+            @click="junk_exportExcel"
             >打印报表</el-button
           >
-          <el-dialog v-model="dialogFormVisible" title="打印报表" >
-            <el-form :model="form" >
 
-              <el-select
-                v-model="junk_form_select_way"
-                class="m-2"
-                placeholder="选择打印类型"
-                clearable
-                size="large"
-              >
-                <el-option
-                  v-for="item in junk_form_option"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-
-              <el-date-picker
-                v-if="junk_form_select_way == 'week'"
-                v-model="junk_form_select_value"
-                type="week"
-                format="[Week] ww"
-                placeholder="请选择某一周"
-                size="large"
-                @change="junk_form_time"
-              />
-              <el-date-picker
-                v-if="junk_form_select_way == 'month'"
-                v-model="junk_form_select_value"
-                type="month"
-                placeholder="请选择某个月"
-                size="large"
-                @change="junk_form_time"
-              />
-
-              <el-date-picker
-                v-if="junk_form_select_way == 'day'"
-                v-model="junk_form_select_value"
-                type="daterange"
-                placeholder="请选择日期"
-                range-separator="到"
-                start-placeholder="选择开始时间"
-                end-placeholder="选择结束时间"
-                size="large"
-                @change="junk_form_time"
-              />
-              <!-- </el-form-item> -->
-            </el-form>
-            <template #footer>
-              <span class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="junk_exportExcel" >
-                  打印
-                </el-button>
-              </span>
-            </template>
-          </el-dialog>
           <dv-charts
             :option="site_name_total"
             style="width: 95%; height: 40vh; margin: auto"
@@ -192,6 +137,7 @@
             end-placeholder="选择结束时间"
             :shortcuts="shortcuts"
             @change="changeDate"
+            :disabled-date="disabledDate"
             size="large"
           />
           <!-- <el-button @click="excuteQuery" size="large" type="primary" style="padding:20px">查询</el-button> -->
@@ -258,6 +204,7 @@
             placeholder="选择车牌信息"
             style="font-size: 25px"
             size="large"
+            @change="search_car_transport"
           >
             <el-option-group>
               <el-option
@@ -299,6 +246,7 @@
             format="[Week] ww"
             placeholder="请选择某一周"
             size="large"
+            :disabled-date="disabledDate"
             @change="search_car_transport"
           />
           <el-date-picker
@@ -309,6 +257,7 @@
             start-placeholder="选择开始时间"
             end-placeholder="选择结束时间"
             size="large"
+            :disabled-date="disabledDate"
             @change="search_car_transport"
           />
 
@@ -320,6 +269,7 @@
             start-placeholder="选择开始时间"
             end-placeholder="选择结束时间"
             size="large"
+            :disabled-date="disabledDate"
             @change="search_car_transport"
           />
           <el-button type="primary" size="large" @click="car_exportExcel" style="margin-left:10px"
@@ -422,6 +372,12 @@ const carData = ref([]);
 const carList = ref([]);
 const carListTianfu = ref([]);
 const carListRenhe = ref([]);
+
+// 禁选今天以后的日期以及没有数据的
+const disabledDate = (time) => {
+        return time.getTime() < new Date("2022-8-31").getTime() || time.getTime() > new Date("2023-3-8").getTime()
+}
+
 // 车牌号列表
 const getAllSiteCar = (site_name) => {
   axios({
@@ -456,10 +412,10 @@ const car_transport_option = [
     value: "day",
     label: "按天查询",
   },
-  {
-    value: "week",
-    label: "按周查询",
-  },
+  // {
+  //   value: "week",
+  //   label: "按周查询",
+  // },
   {
     value: "month",
     label: "按月查询",
@@ -470,29 +426,16 @@ const site_name_option = [
     value: "day",
     label: "按天查询",
   },
-  {
-    value: "week",
-    label: "按周查询",
-  },
+  // {
+  //   value: "week",
+  //   label: "按周查询",
+  // },
   {
     value: "month",
     label: "按月查询",
   },
 ];
-const junk_form_option = [
-  {
-    value: "day",
-    label: "日报表",
-  },
-  {
-    value: "week",
-    label: "周报表",
-  },
-  {
-    value: "month",
-    label: "月报表",
-  },
-];
+
 var json_data = ref();
 var start = ref("");
 var end = ref("");
@@ -512,16 +455,18 @@ const search_car_transport = () => {
   if (queryCarNum.value.trim() != "") {
     carNumber = queryCarNum.value.trim();
   }
-      if (queryCarNum.value == "全部") {
+  if (queryCarNum.value == "全部") {
     carNumber = "all";
   }
 
   console.log("查到的值：" + carNumber);
   if (car_transport_select_value.value == "") {
-    ElMessage({
-      message: "请选择相应日期",
-      type: "error",
-    });
+    // ElMessage({
+    //   message: "请选择相应日期",
+    //   type: "error",
+    // });
+    start = moment().format("YYYY-MM-DD");
+    end = moment().format("YYYY-MM-DD");
   } else {
     var d = new Date(car_transport_select_value.value);
     var start_day =
@@ -543,13 +488,29 @@ const search_car_transport = () => {
       end = moment(endTime).format("YYYY-MM-DD");
     }
     if (car_transport_select_way.value == "month") {
-      start = moment(car_transport_select_value.value[0]).startOf("month").format("YYYY-MM-DD")
-      end=moment(car_transport_select_value.value[1]).endOf("month").format("YYYY-MM-DD")
+      start = moment(car_transport_select_value.value[0])
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      if (
+        moment(car_transport_select_value.value[1]).month() == moment().month()
+      ) {
+        end = moment().format("YYYY-MM-DD");
+      } else {
+        end = moment(car_transport_select_value.value[1])
+          .endOf("month")
+          .format("YYYY-MM-DD");
+      }
+      // const end_month = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+      // end = moment(end_month).format("YYYY-MM-DD");
     }
 
-    getTransportList(start, end, "红星", 1, 10000, carNumber);
+
     // car_transport_select_way.value = "";
   }
+      getTransportList(start, end, "红星", 1, 10000, carNumber);
+      if (queryCarNum.value == "全部所有站点"||queryCarNum.value == "全部"||queryCarNum.value == "") {
+    queryCarNum.value = "全部";
+  } 
 };
 const data_total = reactive([]);
 var renhe_car = new Map();
@@ -677,6 +638,16 @@ function exportExcel(json, name, titleArr, sheetName) {
   console.log("data", data);
   const ws = XLSX.utils.aoa_to_sheet(data);
   const wb = XLSX.utils.book_new();
+    let wscols = [
+    // 每列不同宽度px
+    { wpx: 160 },
+    { wpx: 80 },
+    { wpx: 80 },
+    { wpx: 80 },
+    { wpx: 160 },
+    { wpx: 160 },
+  ];
+  ws["!cols"] = wscols;
   // 此处隐藏英文字段表头
   var wsrows = [{ hidden: true }];
   ws["!rows"] = wsrows; // ws - worksheet
@@ -773,7 +744,7 @@ const search_site_name = () => {
         getSiteNameList(
           site_name_date.value[i],
           site_name_date.value[i],
-          "西华",
+          "红星",
           1,
           10000,
           i
@@ -853,108 +824,63 @@ const recent_days_total = (site_name_date) => {
 recent_days_total(site_name_date);
 
 
-async function junk_form_time() {
-  if (junk_form_select_value.value == "") {
-    ElMessage({
-      message: "请选择相应日期",
-      type: "error",
-    });
-  } else {
-    start = moment(junk_form_select_value.value[0]).format("YYYY-MM-DD");
-    if (junk_form_select_way.value == "day") {
-      end = moment(junk_form_select_value.value[1]).format("YYYY-MM-DD");
-    }
-    if (junk_form_select_way.value == "week") {
-      const endTime = new Date(
-        new Date(junk_form_select_value.value).getTime() +
-          3600 *
-            1000 *
-            24 *
-            (6 - new Date(junk_form_select_value.value).getDay())
-      );
-      start = moment(junk_form_select_value.value).format("YYYY-MM-DD");
-      end = moment(endTime).format("YYYY-MM-DD");
-    }
-    if (junk_form_select_way.value == "month") {
-      start = moment(junk_form_select_value.value)
-        .startOf("month")
-        .format("YYYY-MM-DD");
-      end = moment(junk_form_select_value.value)
-        .endOf("month")
-        .format("YYYY-MM-DD");
-    }
-    console.log(start);
-    console.log(end);
-    //起始时间和终止时间相差的天数
-    let days = moment(end).diff(moment(start), "day");
-    console.log("相差天数：" + days);
-    junk_json.value = [];
-    junk_data.splice(0, junk_data.length);
-    for (let i = 0; i <= days; i++) {
-      (function (i) {
-        setTimeout(function () {
-          getJunkForm(
-            moment(start).add(i, "d").format("YYYY-MM-DD"),
-            moment(start).add(i, "d").format("YYYY-MM-DD"),
-            "红星",
-            1,
-            10000
-          );
-        }, (i + 1) * 30);
-      })(i);
-    }
-    junk_json.value = junk_data;
-    // site_name_select_way.value = "";
-
-  }
-}
-
-const getJunkForm = (start, end, site_name, pageNum, pageSize) => {
+const getJunkForm = (start, end, site_name) => {
   axios({
     url:
-      "/api/dump-record/dump_car/" +
-      start +
-      "/" +
-      end +
-      "/" +
-      site_name +
-      "/" +
-      pageNum +
-      "/" +
-      pageSize,
+      "/api/dump-record/site_data_day/" + start + "/" + end + "/" + site_name,
 
     method: "get",
-  }).then(function (resp) {
-    if (resp.status == 200) {
-      var data = resp.data.data.records;
-      site_name_sum.value = 0;
-      for (let i = 0; i < data.length; i++) {
-        site_name_sum.value = data[i].totalWeight + site_name_sum.value;
-      }
-
-      site_name_sum.value =
-        Math.floor((site_name_sum.value / 1000) * 100) / 100;
-
-      var total = site_name_sum.value;
-      console.log("总量：" + total);
-      var current = {
-        time: start,
-        day: total,
-      };
-      junk_data.push(current);
+    // 下载后台文件：请求头部一定要加上responseType:'blob'
+    responseType: "blob",
+  }).then(function (res) {
+    if (res.status == 200) {
+      console.log("成功了！");
+      // 生成blob对象 定义下载格式
+      let blob = new Blob([res.data], { type: res.type });
+      // 获取文件名
+      let filename = res.headers["content-disposition"];
+      filename = decodeURIComponent(filename.split("filename=")[1]);
+      // 创建 a标签 执行下载
+      let downloadElement = document.createElement("a");
+      let href = window.URL.createObjectURL(blob); //创建下载的链接
+      downloadElement.href = href;
+      downloadElement.download = filename; //下载后文件名
+      document.body.appendChild(downloadElement); // 项目插入a元素
+      downloadElement.click(); //点击下载
+      document.body.removeChild(downloadElement); //下载完成移除元素
+      window.URL.revokeObjectURL(href); //释放blob对象
     }
   });
 };
 
+var junk_export_start = moment().add(-4, "d").format("YYYY-MM-DD");
+var junk_export_end = today_time;
+
 // 导出垃圾报表
 const junk_exportExcel = () => {
-  const titleArr = ["时间", "垃圾总量/kg"]; //表头中文名
-  exportExcel(
-    junk_json.value,
-    "红星站" + start + "至" + end + "垃圾总量统计",
-    titleArr,
-    "sheetName"
-  );
+  if (
+    site_name_select_value.value[0] != null &&
+    site_name_select_value.value[1] != null
+  ) {
+    if (site_name_select_way.value == "day") {
+      junk_export_start = moment(site_name_select_value.value[0]).format(
+        "YYYY-MM-DD"
+      );
+      junk_export_end = moment(site_name_select_value.value[1]).format(
+        "YYYY-MM-DD"
+      );
+    }
+    if (site_name_select_way.value == "month") {
+      junk_export_start = moment(site_name_select_value.value[0])
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      junk_export_end = moment(site_name_select_value.value[1])
+        .endOf("month")
+        .format("YYYY-MM-DD");
+    }
+  }
+
+  getJunkForm(junk_export_start, junk_export_end, "红星");
 };
 
 //===============================================================================================================
@@ -1414,7 +1340,7 @@ const pull_page = (page) => {
   //     delete patrolInfo[key]
   // });
   current_page.value = page;
-  getQuery("红星", "transporter", start, moment(start).add(1,"day").format("YYYY-MM-DD"), page, 10).then(function (resp) {
+  getQuery("红星", "transporter", start, end, page, 10).then(function (resp) {
     data.value = resp;
     ifShowQueryResult.value = false;
   });
